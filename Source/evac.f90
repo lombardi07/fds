@@ -411,6 +411,7 @@ MODULE EVAC
   !
   INTEGER :: n_dead=0, icyc_old=0, n_change_doors=0, n_change_trials=0
   REAL(EB) :: fed_max_alive, fed_max
+  REAL(EB) :: ftd_max_alive, ftd_max ! Purser "fractional dose concept"
   INTEGER, DIMENSION(:,:), ALLOCATABLE :: N_HawkDoveCount
   !
   ! Stairs constants
@@ -5285,6 +5286,8 @@ CONTAINS
     n_dead = -1
     fed_max_alive = 0.0_EB
     fed_max = 0.0_EB
+    ftd_max_alive = 0.0_EB ! Purser "fractional dose concept"
+    ftd_max = 0.0_EB ! Purser "fractional dose concept"
     !
     APPEND_IF: IF (APPEND) THEN
        OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='old', position='append')
@@ -5743,7 +5746,7 @@ CONTAINS
           ! first row: units (or variable class)
           ! second row: variable name
           ! third row-: data
-          WRITE (tcform,'(a,i4.4,a)') "(",n_cols+3+(j_density-j_ntargets),"(a,','),a)"
+          WRITE (tcform,'(a,i4.4,a)') "(",n_cols+5+(j_density-j_ntargets),"(a,','),a)" ! Purser "fractional dose concept"
           WRITE (LU_EVACCSV,tcform) 's','AgentsInside', &
                ('AgentsInsideMesh', i=1,n_egrids), &
                ('AgentsInsideCorr', i=1,n_corrs), &
@@ -5752,7 +5755,7 @@ CONTAINS
                ('TargetExitCounter', i=1,N_EXITS-n_co_exits), &
                ('TargetDoorCounter', i=1,N_DOORS), &
                ('DensityCounter', i=1,j_density-j_ntargets), &
-               'Agents','FED_Index','FED_Index'
+               'Agents','FED_Index','FED_Index','FTD_Index','FTD_Index' ! Purser "fractional dose concept"
           WRITE (LU_EVACCSV,tcform) 'EVAC_Time','AllAgents', &
                (TRIM(EVAC_Node_List(i)%GRID_NAME), i=1,n_egrids), &
                (TRIM(EVAC_CORRS(i)%ID), i=1,n_corrs), &
@@ -5761,7 +5764,7 @@ CONTAINS
                (TRIM(CTEMP(i)), i=1,N_EXITS-n_co_exits), &
                (TRIM(EVAC_DOORS(i)%ID), i=1,N_DOORS), &
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
-               'Number_of_Deads','FED_max','FED_max_alive'
+               'Number_of_Deads','FED_max','FED_max_alive','FTD_max','FTD_max_alive' ! Purser "fractional dose concept"
        ELSE
           ! Do not write the 'fed' columns
           OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='replace')
@@ -6527,6 +6530,7 @@ CONTAINS
              HR%SumForces = 0.0_EB
              HR%SumForces2 = 0.0_EB
              HR%IntDose   = 0.0_EB
+             HR%TmpDose   = 0.0_EB ! Purser "fractional dose concept"
              HR%Eta       = 0.0_EB
              HR%Ksi       = 0.0_EB
              HR%NewRnd    = .TRUE.
@@ -7236,6 +7240,8 @@ CONTAINS
        ICYC_OLD = ICYC
        FED_MAX_ALIVE = 0.0_EB
        FED_MAX       = 0.0_EB
+       FTD_MAX_ALIVE = 0.0_EB ! Purser "fractional dose concept"
+       FTD_MAX       = 0.0_EB ! Purser "fractional dose concept"
     END IF
 
   END SUBROUTINE PREPARE_TO_EVACUATE
@@ -8056,7 +8062,7 @@ CONTAINS
              END IF
           END DO HoleFallLoop
           L_DEAD  = .FALSE.
-          IF ( HR%INTDOSE >= 1.0_EB  ) THEN
+          IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! Purser "fractional dose concept"
              L_DEAD = .TRUE.
              ! No random force for a dead person.
              GATH = 0.0_EB
@@ -8077,9 +8083,11 @@ CONTAINS
              HR%COLOR_INDEX = EVAC_AVATAR_NCOLOR
           ELSE
              FED_MAX_ALIVE = MAX(FED_MAX_ALIVE,HR%INTDOSE)
+             FTD_MAX_ALIVE = MAX(FTD_MAX_ALIVE,HR%TMPDOSE) ! Purser "fractional dose concept"
           END IF
           IF (L_FALLEN_DOWN) HR%COLOR_INDEX = EVAC_AVATAR_NCOLOR
           FED_MAX = MAX(FED_MAX,HR%INTDOSE)  ! Dead or alive
+          FTD_MAX = MAX(FTD_MAX,HR%TMPDOSE) ! Purser "fractional dose concept"
           HR_TAU      = HR%TAU
           HR_TAU_INER = HR%TAU_INER
           ! MAX(0,HR%GROUP_ID)  Group index
@@ -8150,10 +8158,12 @@ CONTAINS
              ! FED_DOSE = FED_LCO*FED_VCO2 + FED_LO
              IF (HR%IEL > 0) THEN  ! From an evac line
                 IF (T >= EVAC_EVACS(HR%IEL)%T_START_FED) THEN
-                   HR%INTDOSE =DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
+                   HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
+                   HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! Purser "fractional dose concept"
                 END IF
              ELSE ! From an entr line
                 HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
+           	HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! Purser "fractional dose concept"
              END IF
              ! Smoke density vs speed
              ! Lund 2003, report 3126 (Frantzich & Nilsson)
@@ -8839,7 +8849,7 @@ CONTAINS
              A_WALL = 0.0_EB
           END IF
           L_DEAD  = .FALSE.
-          IF (HR%INTDOSE >= 1.0_EB) THEN
+          IF (HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB) THEN ! Purser "fractional dose concept"
              L_DEAD = .TRUE.
              ! No random force for a dead person.
              GATH = 0.0_EB
@@ -12223,7 +12233,7 @@ CONTAINS
             INODE = PCX%INODE
             INODE2 = PCX%INODE2
             HR => NOW_LL%HUMAN
-            IF ( HR%INTDOSE >= 1.0_EB  ) THEN
+            IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! Purser "fractional dose concept"
                IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                   N_DEAD = N_DEAD+1
                   HR%TPRE = HUGE(HR%TPRE)
@@ -12233,8 +12243,10 @@ CONTAINS
                END IF
             ELSE
                FED_MAX_ALIVE = MAX(FED_MAX_ALIVE,HR%INTDOSE)
+               FTD_MAX_ALIVE = MAX(FTD_MAX_ALIVE,HR%TMPDOSE) ! Purser "fractional dose concept"
             END IF
             FED_MAX = MAX(FED_MAX,HR%INTDOSE)
+            FTD_MAX = MAX(FTD_MAX,HR%TMPDOSE) ! Purser "fractional dose concept"
 
             ! calculate Purser's fractional effective dose (FED)
             IF (T > T_BEGIN) THEN
@@ -13117,6 +13129,7 @@ CONTAINS
          HR%SumForces = 0.0_EB
          HR%SumForces2 = 0.0_EB
          HR%IntDose   = 0.0_EB
+         HR%TmpDose   = 0.0_EB ! Purser "fractional dose concept"
          HR%Eta       = 0.0_EB
          HR%Ksi       = 0.0_EB
          HR%NewRnd    = .TRUE.
@@ -13593,6 +13606,7 @@ CONTAINS
             HR%SumForces  = 0.0_EB
             HR%SumForces2 = 0.0_EB
             HR%IntDose    = 0.0_EB
+            HR%TmpDose    = 0.0_EB ! Purser "fractional dose concept"
             HR%Eta        = 0.0_EB
             HR%Ksi        = 0.0_EB
             HR%NewRnd     = .TRUE.
@@ -15161,7 +15175,7 @@ CONTAINS
        ! Write the 'fed' columns
        IF (ii_density > ii_ntargets) THEN
           WRITE(tcform,'(a,i4.4,a,a,i4.4,a,a)') "(ES13.5E3,", n_cols, "(',',i8)", "," , &
-               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3)"
+               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! Purser "fractional dose concept"
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
@@ -15169,17 +15183,17 @@ CONTAINS
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                (ITEMP(i), i = ii_ntargets+1,ii_density), &
-               n_dead, fed_max, fed_max_alive
+               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive ! Purser "fractional dose concept"
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
-               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3)"
+               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! Purser "fractional dose concept"
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
                (EVAC_EXITS(i)%ICOUNT, i = 1,N_EXITS), &
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
-               n_dead, fed_max, fed_max_alive
+               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive ! Purser "fractional dose concept"
        END IF
     ELSE
        ! Do not write the 'fed' columns
