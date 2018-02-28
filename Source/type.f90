@@ -631,6 +631,7 @@ TYPE HUMAN_TYPE
    REAL(EB) :: A=2000._EB, B=0.08_EB, C_Young=120000._EB, Gamma=16000._EB, Kappa=40000._EB, &
                Lambda=0.5_EB, Commitment=0._EB
    REAL(EB) :: SumForces=0._EB, IntDose=0._EB, DoseCrit1=0._EB, DoseCrit2=0._EB, SumForces2=0._EB
+   REAL(EB) :: TmpDose=0._EB ! Purser "fractional thermal dose (FTD)"
    REAL(EB) :: TempMax1=0._EB, FluxMax1=0._EB, TempMax2=0._EB, FluxMax2=0._EB, Density=0._EB, DensityR=0._EB, DensityL=0._EB
    REAL(EB) :: P_detect_tot=0._EB, v0_fac=1._EB, D_Walls=0._EB
    REAL(EB) :: T_FallenDown=0._EB, F_FallDown=0._EB, Angle_FallenDown=0._EB, SizeFac_FallenDown=0._EB, T_CheckFallDown=0._EB
