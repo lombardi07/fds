@@ -446,8 +446,8 @@ MODULE EVAC
 CONTAINS
 
 ! LOSA_TEST_REMOVE_START
-PRINT*, "INC_TMP, INC_CO, INC_CO2, INC_O2, INC_HCN, INC_VIS, INC_RAD"										!LOSA_Giacomo
-PRINT*, EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD											!LOSA_Giacomo
+!PRINT*, 'INC_TMP, INC_CO, INC_CO2, INC_O2, INC_HCN, INC_VIS, INC_RAD'										!LOSA_Giacomo
+WRITE(LU_ERR,'(A,I6)') EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD,NM											!LOSA_Giacomo
 !PRINT*,	"n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad"					!LOSA_Giacomo
 !PRINT*,	n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad					!LOSA_Giacomo
 ! n_dead_tmp = 2																							!LOSA_Giacomo
