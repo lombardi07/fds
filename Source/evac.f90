@@ -27,6 +27,7 @@ MODULE EVAC
   USE DCDFLIB, ONLY : DCDFLIB_Gamma => Gamma_ieva
   USE DEVICE_VARIABLES
   USE CONTROL_VARIABLES
+  USE EXP_VAR ! LOSA_Giacomo
 
   IMPLICIT NONE
   PRIVATE
@@ -431,6 +432,23 @@ MODULE EVAC
          !         -1: can not move to the target node
          !         -2: move to door/entry on the same floor
 CONTAINS
+
+! LOSA_TEST_REMOVE_START
+PRINT*, "INC_TMP, INC_CO, INC_CO2, INC_O2, INC_HCN, INC_VIS, INC_RAD"										!LOSA_Giacomo
+PRINT*, INC_TMP, INC_CO, INC_CO2, INC_O2, INC_HCN, INC_VIS, INC_RAD											!LOSA_Giacomo
+PRINT*,	"n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad"					!LOSA_Giacomo
+PRINT*,	n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad					!LOSA_Giacomo
+! n_dead_tmp = 2																							!LOSA_Giacomo
+! n_dead_co = 3																								!LOSA_Giacomo
+! n_dead_co2 = 4																							!LOSA_Giacomo	
+! n_dead_o2 = 5																								!LOSA_Giacomo
+! n_dead_hcn = 6																							!LOSA_Giacomo
+! n_dead_vis = 7																							!LOSA_Giacomo
+! n_dead_rad = 8																							!LOSA_Giacomo
+!PRINT*,	"n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad"				!LOSA_Giacomo
+!PRINT*,	n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad				!LOSA_Giacomo
+! LOSA_TEST_REMOVE_END
+
   !
   SUBROUTINE READ_EVAC(IMODE)
     USE OUTPUT_DATA, ONLY: COLOR2RGB
