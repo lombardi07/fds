@@ -11,7 +11,8 @@
 !
 !!!!!!!!!!!!!!
 !
-MODULE EXP_VAR
+
+MODULE EXP_VAR  ! LOSA Variables declaration
 
 USE READ_MISC
 IMPLICIT NONE
