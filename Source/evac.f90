@@ -12,20 +12,16 @@
 !!!!!!!!!!!!!!
 !
 
-MODULE EXP_VAR  ! LOSA Variables declaration
-
+!MODULE EXP_VAR  ! LOSA Variables declaration
 !USE READ_MISC
-IMPLICIT NONE
-
-TYPE EXP_VAR_IN
-INTEGER :: INC_TMP = EXP_TMP, INC_CO = EXP_CO, INC_CO2 = EXP_CO2, INC_O2 = EXP_O2, INC_HCN = EXP_HCN, INC_VIS = EXP_VIS, INC_RAD = EXP_RAD  
-END TYPE EXP_VAR_IN 
-
-TYPE EXP_VAR_OUT
-INTEGER :: n_dead_tmp = 0, n_dead_co = 0, n_dead_co2 = 0, n_dead_o2 = 0, n_dead_hcn = 0, n_dead_vis = 0, n_dead_rad = 0 
-END TYPE EXP_VAR_OUT 
-
-END MODULE EXP_VAR
+!IMPLICIT NONE
+!TYPE EXP_VAR_IN
+!INTEGER :: INC_TMP = EXP_TMP, INC_CO = EXP_CO, INC_CO2 = EXP_CO2, INC_O2 = EXP_O2, INC_HCN = EXP_HCN, INC_VIS = EXP_VIS, INC_RAD = EXP_RAD  
+!END TYPE EXP_VAR_IN 
+!TYPE EXP_VAR_OUT
+!INTEGER :: n_dead_tmp = 0, n_dead_co = 0, n_dead_co2 = 0, n_dead_o2 = 0, n_dead_hcn = 0, n_dead_vis = 0, n_dead_rad = 0 
+!END TYPE EXP_VAR_OUT 
+!END MODULE EXP_VAR
 
 MODULE EVAC
   !
@@ -43,7 +39,7 @@ MODULE EVAC
   USE DCDFLIB, ONLY : DCDFLIB_Gamma => Gamma_ieva
   USE DEVICE_VARIABLES
   USE CONTROL_VARIABLES
-  USE EXP_VAR ! LOSA_Giacomo
+  !USE EXP_VAR ! LOSA_Giacomo
 
   IMPLICIT NONE
   PRIVATE
@@ -451,9 +447,9 @@ CONTAINS
 
 ! LOSA_TEST_REMOVE_START
 PRINT*, "INC_TMP, INC_CO, INC_CO2, INC_O2, INC_HCN, INC_VIS, INC_RAD"										!LOSA_Giacomo
-PRINT*, INC_TMP, INC_CO, INC_CO2, INC_O2, INC_HCN, INC_VIS, INC_RAD											!LOSA_Giacomo
-PRINT*,	"n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad"					!LOSA_Giacomo
-PRINT*,	n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad					!LOSA_Giacomo
+PRINT*, EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD											!LOSA_Giacomo
+!PRINT*,	"n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad"					!LOSA_Giacomo
+!PRINT*,	n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad					!LOSA_Giacomo
 ! n_dead_tmp = 2																							!LOSA_Giacomo
 ! n_dead_co = 3																								!LOSA_Giacomo
 ! n_dead_co2 = 4																							!LOSA_Giacomo	
