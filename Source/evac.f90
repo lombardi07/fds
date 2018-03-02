@@ -447,7 +447,7 @@ CONTAINS
 
 ! LOSA_TEST_REMOVE_START
 !PRINT*, 'INC_TMP, INC_CO, INC_CO2, INC_O2, INC_HCN, INC_VIS, INC_RAD'										!LOSA_Giacomo
-WRITE(*,*) EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD,NM											!LOSA_Giacomo
+!WRITE(*,*) EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD,NM											!LOSA_Giacomo
 !PRINT*,	"n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad"					!LOSA_Giacomo
 !PRINT*,	n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad					!LOSA_Giacomo
 ! n_dead_tmp = 2																							!LOSA_Giacomo
@@ -5776,7 +5776,7 @@ WRITE(*,*) EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD,NM							
           ! first row: units (or variable class)
           ! second row: variable name
           ! third row-: data
-          WRITE (tcform,'(a,i4.4,a)') "(",n_cols+5+(j_density-j_ntargets),"(a,','),a)" ! Purser "fractional dose concept"
+          WRITE (tcform,'(a,i4.4,a)') "(",n_cols+6+(j_density-j_ntargets),"(a,','),a)" ! Purser "fractional dose concept"
           WRITE (LU_EVACCSV,tcform) 's','AgentsInside', &
                ('AgentsInsideMesh', i=1,n_egrids), &
                ('AgentsInsideCorr', i=1,n_corrs), &
@@ -5785,7 +5785,7 @@ WRITE(*,*) EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD,NM							
                ('TargetExitCounter', i=1,N_EXITS-n_co_exits), &
                ('TargetDoorCounter', i=1,N_DOORS), &
                ('DensityCounter', i=1,j_density-j_ntargets), &
-               'Agents','FED_Index','FED_Index','FTD_Index','FTD_Index' ! Purser "fractional dose concept"
+               'Agents','FED_Index','FED_Index','FTD_Index','FTD_Index','Agents' ! Purser "fractional dose concept"
           WRITE (LU_EVACCSV,tcform) 'EVAC_Time','AllAgents', &
                (TRIM(EVAC_Node_List(i)%GRID_NAME), i=1,n_egrids), &
                (TRIM(EVAC_CORRS(i)%ID), i=1,n_corrs), &
@@ -5794,7 +5794,7 @@ WRITE(*,*) EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD,NM							
                (TRIM(CTEMP(i)), i=1,N_EXITS-n_co_exits), &
                (TRIM(EVAC_DOORS(i)%ID), i=1,N_DOORS), &
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
-               'Number_of_Deads','FED_max','FED_max_alive','FTD_max','FTD_max_alive' ! Purser "fractional dose concept"
+               'Number_of_Deads','FED_max','FED_max_alive','FTD_max','FTD_max_alive','INC_TMP' ! Purser "fractional dose concept"
        ELSE
           ! Do not write the 'fed' columns
           OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='replace')
@@ -15213,7 +15213,7 @@ WRITE(*,*) EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD,NM							
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                (ITEMP(i), i = ii_ntargets+1,ii_density), &
-               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive ! Purser "fractional dose concept"
+               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, exp_tmp ! Purser "fractional dose concept"
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
                "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! Purser "fractional dose concept"
@@ -15223,7 +15223,7 @@ WRITE(*,*) EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD,NM							
                (EVAC_EXITS(i)%ICOUNT, i = 1,N_EXITS), &
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
-               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive ! Purser "fractional dose concept"
+               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, exp_tmp ! Purser "fractional dose concept"
        END IF
     ELSE
        ! Do not write the 'fed' columns
