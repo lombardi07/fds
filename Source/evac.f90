@@ -15213,7 +15213,7 @@ CONTAINS
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                (ITEMP(i), i = ii_ntargets+1,ii_density), &
-               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, exp_tmp ! Purser "fractional dose concept"
+               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, EXP_TMP ! Purser "fractional dose concept"
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
                "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! Purser "fractional dose concept"
@@ -15223,7 +15223,7 @@ CONTAINS
                (EVAC_EXITS(i)%ICOUNT, i = 1,N_EXITS), &
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
-               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, exp_tmp ! Purser "fractional dose concept"
+               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, EXP_TMP ! Purser "fractional dose concept"
        END IF
     ELSE
        ! Do not write the 'fed' columns
