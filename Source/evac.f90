@@ -30,11 +30,6 @@ MODULE EVAC
 
   IMPLICIT NONE
   PRIVATE
-  
-  ! losa: input variables definition
-  TYPE N_INC ! number of incapacitated agents
-  INTEGER :: TMP,CO,CO2,O2,HCN,VIS,RAD
-  END TYPE N_INC
 
   ! Public subprograms (called from the main program or read or dump)
 
@@ -5769,7 +5764,7 @@ CONTAINS
                (TRIM(CTEMP(i)), i=1,N_EXITS-n_co_exits), &
                (TRIM(EVAC_DOORS(i)%ID), i=1,N_DOORS), &
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
-               'Number_of_Deads','FED_max','FED_max_alive','FTD_max','FTD_max_alive','INC_TMP' ! losa: purser's fractional thermal dose (FTD) concept
+               'Number_of_Deads','FED_max','FED_max_alive','FTD_max','FTD_max_alive','N_INC_TMP' ! losa: purser's fractional thermal dose (FTD) concept
        ELSE
           ! Do not write the 'fed' columns
           OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='replace')
@@ -15180,7 +15175,7 @@ CONTAINS
        ! Write the 'fed' columns
        IF (ii_density > ii_ntargets) THEN
           WRITE(tcform,'(a,i4.4,a,a,i4.4,a,a)') "(ES13.5E3,", n_cols, "(',',i8)", "," , &
-               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',i8)" ! losa: purser's fractional thermal dose (FTD) concept
+               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
@@ -15191,7 +15186,7 @@ CONTAINS
                n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, INC_LIM_TMP ! losa: purser's fractional thermal dose (FTD) concept
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
-               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',i8)" ! losa: purser's fractional thermal dose (FTD) concept
+               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
