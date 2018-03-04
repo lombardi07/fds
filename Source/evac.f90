@@ -13,7 +13,6 @@
 !
 MODULE EVAC
   !
-  USE LOSA_PARAMETERS ! losa: use module stored in losa.f90
   USE PRECISION_PARAMETERS
   USE MESH_VARIABLES
   USE GLOBAL_CONSTANTS
@@ -31,6 +30,11 @@ MODULE EVAC
 
   IMPLICIT NONE
   PRIVATE
+  
+  ! losa: input variables definition
+  TYPE N_INC ! number of incapacitated agents
+  INTEGER :: TMP,CO,CO2,O2,HCN,VIS,RAD
+  END TYPE N_INC
 
   ! Public subprograms (called from the main program or read or dump)
 
