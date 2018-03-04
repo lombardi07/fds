@@ -1647,18 +1647,10 @@ NAMELIST /MISC/ AGGLOMERATION,AEROSOL_AL2O3,ALLOW_SURFACE_PARTICLES,ALLOW_UNDERS
                 THERMOPHORETIC_DEPOSITION,THERMOPHORETIC_SETTLING,THICKEN_OBSTRUCTIONS,&
                 TMPA,TURBULENCE_MODEL,TURBULENT_DEPOSITION,TURB_INIT_CLOCK,UVW_FILE,&
                 VEG_LEVEL_SET_COUPLED,VEG_LEVEL_SET_UNCOUPLED,VERBOSE,VISIBILITY_FACTOR,VN_MAX,VN_MIN,Y_CO2_INFTY,Y_O2_INFTY,&
-                WIND_ONLY,& ! LOSA_Giacomo
-		EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD ! LOSA_Giacomo
+                WIND_ONLY
 
 ! Physical constants
 
-EXP_TMP	     = 80 ! LOSA_Giacomo
-EXP_CO	     = 300 ! LOSA_Giacomo
-EXP_CO2	     = 10000 ! LOSA_Giacomo
-EXP_O2	     = 15 ! LOSA_Giacomo
-EXP_HCN	     = 30 ! LOSA_Giacomo
-EXP_VIS	     = 5 ! LOSA_Giacomo
-EXP_RAD	     = 2 ! LOSA_Giacomo
 TMPA         = 20._EB                                              ! Ambient temperature (C)
 GAMMA        = 1.4_EB                                              ! Heat capacity ratio for air
 P_INF        = 101325._EB                                          ! Ambient pressure (Pa)
