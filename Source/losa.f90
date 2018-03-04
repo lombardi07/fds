@@ -4,7 +4,7 @@
 ! 1) Purser thermal dose concept (FTD);
 ! 2) Normative incapacitation limits (temperature, substances, radiation).
 ! Other than this module, source code changes have been made to the following
-! files: evac.f90, type.f90, read.f90.
+! files: cons.f90, evac.f90, type.f90, read.f90.
 ! For further detail search keyword "losa" in the respective files.
 !
 ! Author: J. Maier, G. Perugini. Lombardi SA, Minusio, 2018.
