@@ -11,20 +11,9 @@
 !
 !!!!!!!!!!!!!!
 !
-
-!MODULE EXP_VAR  ! LOSA Variables declaration
-!USE READ_MISC
-!IMPLICIT NONE
-!TYPE EXP_VAR_IN
-!INTEGER :: INC_TMP = EXP_TMP, INC_CO = EXP_CO, INC_CO2 = EXP_CO2, INC_O2 = EXP_O2, INC_HCN = EXP_HCN, INC_VIS = EXP_VIS, INC_RAD = EXP_RAD  
-!END TYPE EXP_VAR_IN 
-!TYPE EXP_VAR_OUT
-!INTEGER :: n_dead_tmp = 0, n_dead_co = 0, n_dead_co2 = 0, n_dead_o2 = 0, n_dead_hcn = 0, n_dead_vis = 0, n_dead_rad = 0 
-!END TYPE EXP_VAR_OUT 
-!END MODULE EXP_VAR
-
 MODULE EVAC
   !
+  USE LOSA_PARAMETERS ! losa: use module stored in losa.f90
   USE PRECISION_PARAMETERS
   USE MESH_VARIABLES
   USE GLOBAL_CONSTANTS
@@ -39,7 +28,6 @@ MODULE EVAC
   USE DCDFLIB, ONLY : DCDFLIB_Gamma => Gamma_ieva
   USE DEVICE_VARIABLES
   USE CONTROL_VARIABLES
-  !USE EXP_VAR ! LOSA_Giacomo
 
   IMPLICIT NONE
   PRIVATE
@@ -424,7 +412,7 @@ MODULE EVAC
   !
   INTEGER :: n_dead=0, icyc_old=0, n_change_doors=0, n_change_trials=0
   REAL(EB) :: fed_max_alive, fed_max
-  REAL(EB) :: ftd_max_alive, ftd_max ! Purser "fractional dose concept"
+  REAL(EB) :: ftd_max_alive, ftd_max ! losa: purser's fractional thermal dose (FTD) concept
   INTEGER, DIMENSION(:,:), ALLOCATABLE :: N_HawkDoveCount
   !
   ! Stairs constants
@@ -444,23 +432,6 @@ MODULE EVAC
          !         -1: can not move to the target node
          !         -2: move to door/entry on the same floor
 CONTAINS
-
-! LOSA_TEST_REMOVE_START
-!PRINT*, 'INC_TMP, INC_CO, INC_CO2, INC_O2, INC_HCN, INC_VIS, INC_RAD'										!LOSA_Giacomo
-!WRITE(*,*) EXP_TMP, EXP_CO, EXP_CO2, EXP_O2, EXP_HCN, EXP_VIS, EXP_RAD,NM											!LOSA_Giacomo
-!PRINT*,	"n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad"					!LOSA_Giacomo
-!PRINT*,	n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad					!LOSA_Giacomo
-! n_dead_tmp = 2																							!LOSA_Giacomo
-! n_dead_co = 3																								!LOSA_Giacomo
-! n_dead_co2 = 4																							!LOSA_Giacomo	
-! n_dead_o2 = 5																								!LOSA_Giacomo
-! n_dead_hcn = 6																							!LOSA_Giacomo
-! n_dead_vis = 7																							!LOSA_Giacomo
-! n_dead_rad = 8																							!LOSA_Giacomo
-!PRINT*,	"n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad"				!LOSA_Giacomo
-!PRINT*,	n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad				!LOSA_Giacomo
-! LOSA_TEST_REMOVE_END
-
   !
   SUBROUTINE READ_EVAC(IMODE)
     USE OUTPUT_DATA, ONLY: COLOR2RGB
@@ -5316,8 +5287,8 @@ CONTAINS
     n_dead = -1
     fed_max_alive = 0.0_EB
     fed_max = 0.0_EB
-    ftd_max_alive = 0.0_EB ! Purser "fractional dose concept"
-    ftd_max = 0.0_EB ! Purser "fractional dose concept"
+    ftd_max_alive = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
+    ftd_max = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
     !
     APPEND_IF: IF (APPEND) THEN
        OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='old', position='append')
@@ -5776,7 +5747,7 @@ CONTAINS
           ! first row: units (or variable class)
           ! second row: variable name
           ! third row-: data
-          WRITE (tcform,'(a,i4.4,a)') "(",n_cols+6+(j_density-j_ntargets),"(a,','),a)" ! Purser "fractional dose concept"
+          WRITE (tcform,'(a,i4.4,a)') "(",n_cols+6+(j_density-j_ntargets),"(a,','),a)" ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,tcform) 's','AgentsInside', &
                ('AgentsInsideMesh', i=1,n_egrids), &
                ('AgentsInsideCorr', i=1,n_corrs), &
@@ -5785,7 +5756,7 @@ CONTAINS
                ('TargetExitCounter', i=1,N_EXITS-n_co_exits), &
                ('TargetDoorCounter', i=1,N_DOORS), &
                ('DensityCounter', i=1,j_density-j_ntargets), &
-               'Agents','FED_Index','FED_Index','FTD_Index','FTD_Index','Agents' ! Purser "fractional dose concept"
+               'Agents','FED_Index','FED_Index','FTD_Index','FTD_Index','Agents' ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,tcform) 'EVAC_Time','AllAgents', &
                (TRIM(EVAC_Node_List(i)%GRID_NAME), i=1,n_egrids), &
                (TRIM(EVAC_CORRS(i)%ID), i=1,n_corrs), &
@@ -5794,7 +5765,7 @@ CONTAINS
                (TRIM(CTEMP(i)), i=1,N_EXITS-n_co_exits), &
                (TRIM(EVAC_DOORS(i)%ID), i=1,N_DOORS), &
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
-               'Number_of_Deads','FED_max','FED_max_alive','FTD_max','FTD_max_alive','INC_TMP' ! Purser "fractional dose concept"
+               'Number_of_Deads','FED_max','FED_max_alive','FTD_max','FTD_max_alive','INC_TMP' ! losa: purser's fractional thermal dose (FTD) concept
        ELSE
           ! Do not write the 'fed' columns
           OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='replace')
@@ -6560,7 +6531,7 @@ CONTAINS
              HR%SumForces = 0.0_EB
              HR%SumForces2 = 0.0_EB
              HR%IntDose   = 0.0_EB
-             HR%TmpDose   = 0.0_EB ! Purser "fractional dose concept"
+             HR%TmpDose   = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
              HR%Eta       = 0.0_EB
              HR%Ksi       = 0.0_EB
              HR%NewRnd    = .TRUE.
@@ -7270,8 +7241,8 @@ CONTAINS
        ICYC_OLD = ICYC
        FED_MAX_ALIVE = 0.0_EB
        FED_MAX       = 0.0_EB
-       FTD_MAX_ALIVE = 0.0_EB ! Purser "fractional dose concept"
-       FTD_MAX       = 0.0_EB ! Purser "fractional dose concept"
+       FTD_MAX_ALIVE = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
+       FTD_MAX       = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
     END IF
 
   END SUBROUTINE PREPARE_TO_EVACUATE
@@ -8092,7 +8063,7 @@ CONTAINS
              END IF
           END DO HoleFallLoop
           L_DEAD  = .FALSE.
-          IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! Purser "fractional dose concept"
+          IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (FTD) concept
              L_DEAD = .TRUE.
              ! No random force for a dead person.
              GATH = 0.0_EB
@@ -8113,11 +8084,11 @@ CONTAINS
              HR%COLOR_INDEX = EVAC_AVATAR_NCOLOR
           ELSE
              FED_MAX_ALIVE = MAX(FED_MAX_ALIVE,HR%INTDOSE)
-             FTD_MAX_ALIVE = MAX(FTD_MAX_ALIVE,HR%TMPDOSE) ! Purser "fractional dose concept"
+             FTD_MAX_ALIVE = MAX(FTD_MAX_ALIVE,HR%TMPDOSE) ! losa: purser's fractional thermal dose (FTD) concept
           END IF
           IF (L_FALLEN_DOWN) HR%COLOR_INDEX = EVAC_AVATAR_NCOLOR
           FED_MAX = MAX(FED_MAX,HR%INTDOSE)  ! Dead or alive
-          FTD_MAX = MAX(FTD_MAX,HR%TMPDOSE) ! Purser "fractional dose concept"
+          FTD_MAX = MAX(FTD_MAX,HR%TMPDOSE) ! losa: purser's fractional thermal dose (FTD) concept
           HR_TAU      = HR%TAU
           HR_TAU_INER = HR%TAU_INER
           ! MAX(0,HR%GROUP_ID)  Group index
@@ -8189,11 +8160,11 @@ CONTAINS
              IF (HR%IEL > 0) THEN  ! From an evac line
                 IF (T >= EVAC_EVACS(HR%IEL)%T_START_FED) THEN
                    HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
-                   HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! Purser "fractional dose concept"
+                   HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (FTD) concept
                 END IF
              ELSE ! From an entr line
                 HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
-           	HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! Purser "fractional dose concept"
+           	HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (FTD) concept
              END IF
              ! Smoke density vs speed
              ! Lund 2003, report 3126 (Frantzich & Nilsson)
@@ -8879,7 +8850,7 @@ CONTAINS
              A_WALL = 0.0_EB
           END IF
           L_DEAD  = .FALSE.
-          IF (HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB) THEN ! Purser "fractional dose concept"
+          IF (HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB) THEN ! losa: purser's fractional thermal dose (FTD) concept
              L_DEAD = .TRUE.
              ! No random force for a dead person.
              GATH = 0.0_EB
@@ -12263,7 +12234,7 @@ CONTAINS
             INODE = PCX%INODE
             INODE2 = PCX%INODE2
             HR => NOW_LL%HUMAN
-            IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! Purser "fractional dose concept"
+            IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (FTD) concept
                IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                   N_DEAD = N_DEAD+1
                   HR%TPRE = HUGE(HR%TPRE)
@@ -12273,10 +12244,10 @@ CONTAINS
                END IF
             ELSE
                FED_MAX_ALIVE = MAX(FED_MAX_ALIVE,HR%INTDOSE)
-               FTD_MAX_ALIVE = MAX(FTD_MAX_ALIVE,HR%TMPDOSE) ! Purser "fractional dose concept"
+               FTD_MAX_ALIVE = MAX(FTD_MAX_ALIVE,HR%TMPDOSE) ! losa: purser's fractional thermal dose (FTD) concept
             END IF
             FED_MAX = MAX(FED_MAX,HR%INTDOSE)
-            FTD_MAX = MAX(FTD_MAX,HR%TMPDOSE) ! Purser "fractional dose concept"
+            FTD_MAX = MAX(FTD_MAX,HR%TMPDOSE) ! losa: purser's fractional thermal dose (FTD) concept
 
             ! calculate Purser's fractional effective dose (FED)
             IF (T > T_BEGIN) THEN
@@ -13159,7 +13130,7 @@ CONTAINS
          HR%SumForces = 0.0_EB
          HR%SumForces2 = 0.0_EB
          HR%IntDose   = 0.0_EB
-         HR%TmpDose   = 0.0_EB ! Purser "fractional dose concept"
+         HR%TmpDose   = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
          HR%Eta       = 0.0_EB
          HR%Ksi       = 0.0_EB
          HR%NewRnd    = .TRUE.
@@ -13636,7 +13607,7 @@ CONTAINS
             HR%SumForces  = 0.0_EB
             HR%SumForces2 = 0.0_EB
             HR%IntDose    = 0.0_EB
-            HR%TmpDose    = 0.0_EB ! Purser "fractional dose concept"
+            HR%TmpDose    = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
             HR%Eta        = 0.0_EB
             HR%Ksi        = 0.0_EB
             HR%NewRnd     = .TRUE.
@@ -15205,7 +15176,7 @@ CONTAINS
        ! Write the 'fed' columns
        IF (ii_density > ii_ntargets) THEN
           WRITE(tcform,'(a,i4.4,a,a,i4.4,a,a)') "(ES13.5E3,", n_cols, "(',',i8)", "," , &
-               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! Purser "fractional dose concept"
+               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
@@ -15213,17 +15184,17 @@ CONTAINS
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                (ITEMP(i), i = ii_ntargets+1,ii_density), &
-               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, EVAC_PRESSURE_ITERATIONS ! Purser "fractional dose concept"
+               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, INC_LIM_TMP ! losa: purser's fractional thermal dose (FTD) concept
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
-               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! Purser "fractional dose concept"
+               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
                (EVAC_EXITS(i)%ICOUNT, i = 1,N_EXITS), &
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
-               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, EVAC_PRESSURE_ITERATIONS ! Purser "fractional dose concept"
+               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, INC_LIM_TMP ! losa: purser's fractional thermal dose (FTD) concept
        END IF
     ELSE
        ! Do not write the 'fed' columns
