@@ -1,5 +1,6 @@
 MODULE READ_INPUT
 
+USE LOSA_PARAMETERS ! losa: use module stored in losa.f90
 USE PRECISION_PARAMETERS
 USE MESH_VARIABLES
 USE GLOBAL_CONSTANTS
@@ -1650,7 +1651,7 @@ NAMELIST /MISC/ AGGLOMERATION,AEROSOL_AL2O3,ALLOW_SURFACE_PARTICLES,ALLOW_UNDERS
                 WIND_ONLY,& ! losa: new line
                 INC_LIM_TMP,INC_LIM_CO,INC_LIM_CO2,INC_LIM_O2,INC_LIM_HCN,INC_LIM_VIS,INC_LIM_RAD ! losa: use incapacitation limits in misc namelist
 
-! losa constants
+! losa: constants
 
 INC_LIM_TMP  = 80._EB ! losa: define default for temperature (°C)
 INC_LIM_CO   = 3000._EB ! losa: define default for CO concentration (ppm)
