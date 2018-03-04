@@ -7,7 +7,7 @@
 ! files: evac.f90, type.f90, read.f90.
 ! For further detail search keyword "losa" in the respective files.
 !
-! Author: J. Maier, G. Perugini, Lombardi SA, Minusio, 2018.
+! Author: J. Maier, G. Perugini. Lombardi SA, Minusio, 2018.
 !
 
 MODULE LOSA_PARAMETERS
