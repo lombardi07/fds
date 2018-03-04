@@ -1,10 +1,24 @@
-MODULE EXP_VAR
-USE READ_MISC
+!
+! This module contains the input and output variables definition implemented by 
+! Lombardi Sa to integrate following features:
+! 1) Purser thermal dose concept (FTD);
+! 2) Normative incapacitation limits (temperature, substances, radiation).
+! Other than this module, source code changes have been made to the following
+! files: evac.f90, type.f90, read.f90.
+! For further detail search keyword "losa" in the respective files.
+!
+! Author: J. Maier, G. Perugini, Lombardi SA, Minusio, 2018.
+!
+
+MODULE LOSA_PARAMETERS
+
 IMPLICIT NONE
-TYPE EXP_VAR_IN
-INTEGER :: INC_TMP = EXP_TMP, INC_CO = EXP_CO, INC_CO2 = EXP_CO2, INC_O2 = EXP_O2, INC_HCN = EXP_HCN, INC_VIS = EXP_VIS, INC_RAD = EXP_RAD
-END TYPE EXP_VAR_IN
-TYPE EXP_VAR_OUT
-INTEGER :: n_dead_tmp = 0, n_dead_co = 0, n_dead_co2 = 0, n_dead_o2 = 0, n_dead_hcn = 0, n_dead_vis = 0, n_dead_rad = 0
-END TYPE EXP_VAR_OUT
-END MODULE EXP_VAR
+
+! input variables definition
+REAL(EB) :: INC_LIM_TMP,INC_LIM_CO,INC_LIM_CO2,INC_LIM_O2,INC_LIM_HCN,INC_LIM_VIS,INC_LIM_RAD
+! input variables definition
+TYPE N_INC ! number of incapacitated agents
+INTEGER :: TMP,CO,CO2,O2,HCN,VIS,RAD
+END TYPE N_INC
+
+END MODULE LOSA_PARAMETERS
