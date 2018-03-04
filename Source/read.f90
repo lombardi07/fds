@@ -1647,7 +1647,18 @@ NAMELIST /MISC/ AGGLOMERATION,AEROSOL_AL2O3,ALLOW_SURFACE_PARTICLES,ALLOW_UNDERS
                 THERMOPHORETIC_DEPOSITION,THERMOPHORETIC_SETTLING,THICKEN_OBSTRUCTIONS,&
                 TMPA,TURBULENCE_MODEL,TURBULENT_DEPOSITION,TURB_INIT_CLOCK,UVW_FILE,&
                 VEG_LEVEL_SET_COUPLED,VEG_LEVEL_SET_UNCOUPLED,VERBOSE,VISIBILITY_FACTOR,VN_MAX,VN_MIN,Y_CO2_INFTY,Y_O2_INFTY,&
-                WIND_ONLY
+                WIND_ONLY,& ! losa: new line
+                INC_LIM_TMP,INC_LIM_CO,INC_LIM_CO2,INC_LIM_O2,INC_LIM_HCN,INC_LIM_VIS,INC_LIM_RAD ! losa: use incapacitation limits in misc namelist
+
+! losa constants
+
+INC_LIM_TMP  = 80._EB ! losa: define default for temperature (°C)
+INC_LIM_CO   = 3000._EB ! losa: define default for CO concentration (ppm)
+INC_LIM_CO2  = 10000._EB ! losa: define default for CO2 concentration (ppm)
+INC_LIM_O2   = 15._EB ! losa: define default for O2 volume fraction (%)
+INC_LIM_HCN  = 30._EB ! losa: define default for HCN concentration (ppm)
+INC_LIM_VIS  = 5._EB ! losa: define default for visibility (m)
+INC_LIM_RAD  = 2000._EB ! losa: define default for radiation (kW/m2)
 
 ! Physical constants
 
