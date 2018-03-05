@@ -15193,7 +15193,7 @@ CONTAINS
                (EVAC_EXITS(i)%ICOUNT, i = 1,N_EXITS), &
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
-               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, INC_LIM_TMP ! losa: purser's fractional thermal dose (FTD) concept
+               n_dead, fed_max, fed_max_alive, ftd_max, ftd_max_alive, ftd_max_alive ! losa: purser's fractional thermal dose (FTD) concept
        END IF
     ELSE
        ! Do not write the 'fed' columns
