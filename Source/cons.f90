@@ -5,13 +5,6 @@ MODULE GLOBAL_CONSTANTS
 USE PRECISION_PARAMETERS
 IMPLICIT NONE
 
-! losa: input variables definition
-REAL(EB) :: INC_LIM_TMP,INC_LIM_CO,INC_LIM_CO2,INC_LIM_O2,INC_LIM_HCN,INC_LIM_VIS,INC_LIM_RAD
-! losa: input variables definition
-TYPE N_INC ! number of incapacitated agents
-INTEGER :: TMP,CO,CO2,O2,HCN,VIS,RAD
-END TYPE N_INC
-
 ! Indices for various modes of operation
 
 INTEGER, PARAMETER :: GAS_SPECIES=2,AEROSOL_SPECIES=3                                       ! For SPECIES%MODE
