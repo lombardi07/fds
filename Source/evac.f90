@@ -15177,7 +15177,7 @@ CONTAINS
        ! Write the 'fed' columns
        IF (ii_density > ii_ntargets) THEN
           WRITE(tcform,'(a,i4.4,a,a,i4.4,a,a)') "(ES13.5E3,", n_cols, "(',',i8)", "," , &
-               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,3(',',ES13.5E3))" ! losa: purser's fractional thermal dose (FTD) concept
+               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,2(',',ES13.5E3),7(',',i8))" ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
@@ -15186,10 +15186,11 @@ CONTAINS
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                (ITEMP(i), i = ii_ntargets+1,ii_density), &
                n_dead, fed_max, fed_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
-               ftd_max, ftd_max_alive, INC_LIM_TMP ! losa: purser's fractional thermal dose (FTD) concept
+               ftd_max, ftd_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
+               N_INC%TMP, N_INC%CO, N_INC%CO2, N_INC%O2, N_INC%HCN, N_INC%VIS, N_INC%RAD ! losa: purser's fractional thermal dose (FTD) concept
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
-               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,3(',',ES13.5E3))" ! losa: purser's fractional thermal dose (FTD) concept
+               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,2(',',ES13.5E3),7(',',i8))" ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
@@ -15197,7 +15198,8 @@ CONTAINS
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                n_dead, fed_max, fed_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
-               ftd_max, ftd_max_alive, INC_LIM_TMP ! losa: purser's fractional thermal dose (FTD) concept
+               ftd_max, ftd_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
+               N_INC%TMP, N_INC%CO, N_INC%CO2, N_INC%O2, N_INC%HCN, N_INC%VIS, N_INC%RAD ! losa: purser's fractional thermal dose (FTD) concept
        END IF
     ELSE
        ! Do not write the 'fed' columns
