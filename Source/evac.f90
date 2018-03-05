@@ -5746,7 +5746,7 @@ CONTAINS
           ! first row: units (or variable class)
           ! second row: variable name
           ! third row-: data
-          WRITE (tcform,'(a,i4.4,a)') "(",n_cols+3+(j_density-j_ntargets)+3,"(a,','),a)" ! losa: purser's fractional thermal dose (FTD) concept
+          WRITE (tcform,'(a,i4.4,a)') "(",n_cols+3+(j_density-j_ntargets)+2+7,"(a,','),a)" ! losa: adding output columns to format
           WRITE (LU_EVACCSV,tcform) 's','AgentsInside', &
                ('AgentsInsideMesh', i=1,n_egrids), &
                ('AgentsInsideCorr', i=1,n_corrs), &
@@ -5755,8 +5755,9 @@ CONTAINS
                ('TargetExitCounter', i=1,N_EXITS-n_co_exits), &
                ('TargetDoorCounter', i=1,N_DOORS), &
                ('DensityCounter', i=1,j_density-j_ntargets), &
-               'Agents','FED_Index','FED_Index', & ! losa: purser's fractional thermal dose (FTD) concept
-               'FTD_Index','FTD_Index','Agents' ! losa: purser's fractional thermal dose (FTD) concept
+               'Agents','FED_Index','FED_Index', & ! losa: new line
+               'FTD_Index','FTD_Index', & ! losa: purser's fractional thermal dose (FTD) concept
+               'Agents','Agents','Agents','Agents','Agents','Agents','Agents' ! losa: incapacitation limits
           WRITE (LU_EVACCSV,tcform) 'EVAC_Time','AllAgents', &
                (TRIM(EVAC_Node_List(i)%GRID_NAME), i=1,n_egrids), &
                (TRIM(EVAC_CORRS(i)%ID), i=1,n_corrs), &
@@ -5765,8 +5766,9 @@ CONTAINS
                (TRIM(CTEMP(i)), i=1,N_EXITS-n_co_exits), &
                (TRIM(EVAC_DOORS(i)%ID), i=1,N_DOORS), &
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
-               'Number_of_Deads','FED_max','FED_max_alive', & ! losa: purser's fractional thermal dose (FTD) concept
-               'FTD_max','FTD_max_alive','N_INC_TMP' ! losa: purser's fractional thermal dose (FTD) concept
+               'Number_of_Deads','FED_max','FED_max_alive', & ! losa: new line
+               'FTD_max','FTD_max_alive' ! losa: purser's fractional thermal dose (FTD) concept
+               'N_INC_TMP','N_INC_CO','N_INC_CO2','N_INC_O2','N_INC_HCN','N_INC_VIS','N_INC_RAD' ! losa: incapacitation limits
        ELSE
           ! Do not write the 'fed' columns
           OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='replace')
@@ -15177,7 +15179,7 @@ CONTAINS
        ! Write the 'fed' columns
        IF (ii_density > ii_ntargets) THEN
           WRITE(tcform,'(a,i4.4,a,a,i4.4,a,a)') "(ES13.5E3,", n_cols, "(',',i8)", "," , &
-               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,2(',',ES13.5E3),7(',',i8))" ! losa: purser's fractional thermal dose (FTD) concept
+               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,2(',',ES13.5E3),7(',',i8))" ! losa: adding output columns to format
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
@@ -15185,21 +15187,21 @@ CONTAINS
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                (ITEMP(i), i = ii_ntargets+1,ii_density), &
-               n_dead, fed_max, fed_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
+               n_dead, fed_max, fed_max_alive, & ! losa: new line
                ftd_max, ftd_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
-               N_INC_TMP, N_INC_CO, N_INC_CO2, N_INC_O2, N_INC_HCN, N_INC_VIS, N_INC_RAD ! losa: purser's fractional thermal dose (FTD) concept
+               N_INC_TMP, N_INC_CO, N_INC_CO2, N_INC_O2, N_INC_HCN, N_INC_VIS, N_INC_RAD ! losa: incapacitation limits
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
-               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,2(',',ES13.5E3),7(',',i8))" ! losa: purser's fractional thermal dose (FTD) concept
+               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,2(',',ES13.5E3),7(',',i8))" ! losa: adding output columns to format
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
                (EVAC_EXITS(i)%ICOUNT, i = 1,N_EXITS), &
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
-               n_dead, fed_max, fed_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
+               n_dead, fed_max, fed_max_alive, & ! losa: new line
                ftd_max, ftd_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
-               N_INC_TMP, N_INC_CO, N_INC_CO2, N_INC_O2, N_INC_HCN, N_INC_VIS, N_INC_RAD ! losa: purser's fractional thermal dose (FTD) concept
+               N_INC_TMP, N_INC_CO, N_INC_CO2, N_INC_O2, N_INC_HCN, N_INC_VIS, N_INC_RAD ! losa: incapacitation limits
        END IF
     ELSE
        ! Do not write the 'fed' columns
