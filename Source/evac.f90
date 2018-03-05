@@ -5755,7 +5755,8 @@ CONTAINS
                ('TargetExitCounter', i=1,N_EXITS-n_co_exits), &
                ('TargetDoorCounter', i=1,N_DOORS), &
                ('DensityCounter', i=1,j_density-j_ntargets), &
-               'Agents','FED_Index','FED_Index','FTD_Index','FTD_Index','Agents' ! losa: purser's fractional thermal dose (FTD) concept
+               'Agents','FED_Index','FED_Index', & ! losa: purser's fractional thermal dose (FTD) concept
+               'FTD_Index','FTD_Index','Agents' ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,tcform) 'EVAC_Time','AllAgents', &
                (TRIM(EVAC_Node_List(i)%GRID_NAME), i=1,n_egrids), &
                (TRIM(EVAC_CORRS(i)%ID), i=1,n_corrs), &
@@ -5764,7 +5765,8 @@ CONTAINS
                (TRIM(CTEMP(i)), i=1,N_EXITS-n_co_exits), &
                (TRIM(EVAC_DOORS(i)%ID), i=1,N_DOORS), &
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
-               'Number_of_Deads','FED_max','FED_max_alive','FTD_max','FTD_max_alive','N_INC_TMP' ! losa: purser's fractional thermal dose (FTD) concept
+               'Number_of_Deads','FED_max','FED_max_alive', & ! losa: purser's fractional thermal dose (FTD) concept
+               'FTD_max','FTD_max_alive','N_INC_TMP' ! losa: purser's fractional thermal dose (FTD) concept
        ELSE
           ! Do not write the 'fed' columns
           OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='replace')
@@ -15185,7 +15187,7 @@ CONTAINS
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                (ITEMP(i), i = ii_ntargets+1,ii_density), &
                n_dead, fed_max, fed_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
-               ftd_max, ftd_max_alive, INC_LIM_TMP ! losa: purser's fractional thermal dose (FTD) concept
+               ftd_max, ftd_max_alive ! losa: purser's fractional thermal dose (FTD) concept, INC_LIM_TMP
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
                "(',',i8)", ",',',ES13.5E3,',',ES13.5E3",& ! losa: purser's fractional thermal dose (FTD) concept
@@ -15197,7 +15199,7 @@ CONTAINS
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                n_dead, fed_max, fed_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
-               ftd_max, ftd_max_alive, INC_LIM_TMP ! losa: purser's fractional thermal dose (FTD) concept
+               ftd_max, ftd_max_alive ! losa: purser's fractional thermal dose (FTD) concept, INC_LIM_TMP
        END IF
     ELSE
        ! Do not write the 'fed' columns
