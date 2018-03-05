@@ -5767,7 +5767,7 @@ CONTAINS
                (TRIM(EVAC_DOORS(i)%ID), i=1,N_DOORS), &
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
                'Number_of_Deads','FED_max','FED_max_alive', & ! losa: new line
-               'FTD_max','FTD_max_alive' ! losa: purser's fractional thermal dose (FTD) concept
+               'FTD_max','FTD_max_alive', & ! losa: purser's fractional thermal dose (FTD) concept
                'N_INC_TMP','N_INC_CO','N_INC_CO2','N_INC_O2','N_INC_HCN','N_INC_VIS','N_INC_RAD' ! losa: incapacitation limits
        ELSE
           ! Do not write the 'fed' columns
