@@ -15177,7 +15177,7 @@ CONTAINS
        ! Write the 'fed' columns
        IF (ii_density > ii_ntargets) THEN
           WRITE(tcform,'(a,i4.4,a,a,i4.4,a,a)') "(ES13.5E3,", n_cols, "(',',i8)", "," , &
-               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! losa: purser's fractional thermal dose (FTD) concept
+               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',ES13.5E3,',',ES13.5E3,2(',',ES13.5E3))" ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
@@ -15189,7 +15189,7 @@ CONTAINS
                ftd_max, ftd_max_alive ! losa: purser's fractional thermal dose (FTD) concept, INC_LIM_TMP
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
-               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,',',ES13.5E3,',',ES13.5E3)" ! losa: purser's fractional thermal dose (FTD) concept
+               "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,2(',',ES13.5E3))" ! losa: purser's fractional thermal dose (FTD) concept
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
