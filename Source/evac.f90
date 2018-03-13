@@ -8072,9 +8072,11 @@ CONTAINS
              END IF
           END DO HoleFallLoop
           IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
-             IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
-             lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
-             HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
+             IF (HR%TPRE /= HUGE(HR%TPRE)) THEN ! losa: start incapacitating after TPRE
+                IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
+                lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
+                HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
+             END IF
           ELSE ! losa: output max alive of incapacitating quantity
              lim_tmp = MAX(lim_tmp,HR%LimTmp) ! losa: max of incapacitating quantity of living agent
              lim_rad = MAX(lim_rad,HR%LimRad) ! losa: max of incapacitating quantity of living agent
