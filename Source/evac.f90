@@ -15258,7 +15258,7 @@ CONTAINS
     END DO
     ii_density = ii
     !
-    IF (n_dead>=0 .OR. n_dead_tmp>=0 .OR. n_dead_co>=0 .OR. n_dead_co2>=0 .OR. n_dead_o2>=0 .OR. n_dead_hcn>=0 .OR. n_dead_vis>=0 .OR. n_dead_rad>=0) THEN ! losa: incapacitation limits
+    IF (n_dead>=0 .OR. n_dead_tmp>=0 .OR. n_dead_rad>=0 .OR. n_dead_vis>=0) THEN ! losa: incapacitation limits, missing:  .OR. n_dead_co>=0 .OR. n_dead_co2>=0 .OR. n_dead_o2>=0 .OR. n_dead_hcn>=0
        ! Write the 'fed' columns
        IF (ii_density > ii_ntargets) THEN
           WRITE(tcform,'(a,i4.4,a,a,i4.4,a,a)') "(ES13.5E3,", n_cols, "(',',i8)", "," , &
