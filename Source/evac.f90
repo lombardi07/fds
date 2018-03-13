@@ -5284,6 +5284,13 @@ CONTAINS
     ! Initialize the FED counters:
     icyc_old = -1
     n_dead = -1
+    n_dead_tmp=-1 ! losa: incapacitation limits, death counter
+    n_dead_rad=-1 ! losa: incapacitation limits, death counter
+    n_dead_co=-1 ! losa: incapacitation limits, death counter
+    n_dead_co2=-1 ! losa: incapacitation limits, death counter
+    n_dead_o2=-1 ! losa: incapacitation limits, death counter
+    n_dead_hcn=-1 ! losa: incapacitation limits, death counter
+    n_dead_vis=-1 ! losa: incapacitation limits, death counter
     fed_max_alive = 0.0_EB
     fed_max = 0.0_EB
     ftd_max_alive = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
@@ -5509,7 +5516,16 @@ CONTAINS
           END IF
        END IF EFF_READ_RESTART
        !
-       IF ( l_fed_read .OR. l_fed_save ) n_dead = 0
+       IF ( l_fed_read .OR. l_fed_save ) THEN ! losa: new line, then
+          n_dead = 0
+          n_dead_tmp=0 ! losa: incapacitation limits, death counter
+          n_dead_rad=0 ! losa: incapacitation limits, death counter
+          n_dead_co=0 ! losa: incapacitation limits, death counter
+          n_dead_co2=0 ! losa: incapacitation limits, death counter
+          n_dead_o2=0 ! losa: incapacitation limits, death counter
+          n_dead_hcn=0 ! losa: incapacitation limits, death counter
+          n_dead_vis=0 ! losa: incapacitation limits, death counter
+       END IF ! losa: end if
        !
        ! Restart: read always from the hard drive
        ios = 3
@@ -5741,6 +5757,13 @@ CONTAINS
        IF ( l_fed_read .OR. l_fed_save .OR. L_FALLING_MODEL) THEN
           ! Write the 'fed' columns
           n_dead = 0
+          n_dead_tmp=0 ! losa: incapacitation limits, death counter
+          n_dead_co=0 ! losa: incapacitation limits, death counter
+          n_dead_co2=0 ! losa: incapacitation limits, death counter
+          n_dead_o2=0 ! losa: incapacitation limits, death counter
+          n_dead_hcn=0 ! losa: incapacitation limits, death counter
+          n_dead_vis=0 ! losa: incapacitation limits, death counter
+          n_dead_rad=0 ! losa: incapacitation limits, death counter
           OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='replace')
           ! June 2009: Changed the .csv file format to the fds5 style
           ! first row: units (or variable class)
@@ -5768,7 +5791,7 @@ CONTAINS
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
                'Number_of_Deads','FED_max','FED_max_alive', & ! losa: new line
                'FTD_max','FTD_max_alive', & ! losa: purser's fractional thermal dose (FTD) concept
-               'N_INC_TMP','N_INC_CO','N_INC_CO2','N_INC_O2','N_INC_HCN','N_INC_VIS','N_INC_RAD' ! losa: incapacitation limits
+               'N_Dead_Tmp','N_Dead_CO','N_Dead_CO2','N_Dead_O2','N_Dead_HCN','N_Dead_Vis','N_Dead_Rad' ! losa: incapacitation limits
        ELSE
           ! Do not write the 'fed' columns
           OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='replace')
@@ -8065,6 +8088,19 @@ CONTAINS
                 CYCLE HoleFallLoop
              END IF
           END DO HoleFallLoop
+          IF ( HR%IncTmp>=INC_LIM_TMP ) THEN ! losa: begin if, incapacitation limits
+             IF (L_FALLEN_DOWN) n_dead_tmp=n_dead_tmp-1 ! losa: incapacitation limits, death counter
+             n_dead_tmp=n_dead_tmp+1 ! losa: incapacitation limits, death counter
+          END IF ! losa: end if, incapacitation limits
+          IF ( HR%IncRad>=INC_LIM_RAD ) THEN ! losa: begin if, incapacitation limits
+             IF (L_FALLEN_DOWN) n_dead_rad=n_dead_rad-1 ! losa: incapacitation limits, death counter
+             n_dead_rad=n_dead_rad+1 ! losa: incapacitation limits, death counter
+          END IF ! losa: end if, incapacitation limits
+          IF ( HR%IncVis>=INC_LIM_VIS ) THEN ! losa: begin if, incapacitation limits
+             IF (L_FALLEN_DOWN) n_dead_vis=n_dead_vis-1 ! losa: incapacitation limits, death counter
+             n_dead_vis=n_dead_vis+1 ! losa: incapacitation limits, death counter
+          END IF ! losa: end if, incapacitation limits
+          ! losa: todo: missing conditions for HR%IncCO=INC_LIM_CO,HR%IncCO2=INC_LIM_CO2,HR%IncO2=INC_LIM_O2,HR%IncHCN=INC_LIM_HCN
           L_DEAD  = .FALSE.
           IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (FTD) concept
              L_DEAD = .TRUE.
@@ -8164,10 +8200,24 @@ CONTAINS
                 IF (T >= EVAC_EVACS(HR%IEL)%T_START_FED) THEN
                    HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
                    HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (FTD) concept
+                   HR%INCTMP = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                   HR%INCRAD = HR%RADFLUX ! losa: incapacitating quantity
+                   HR%INCCO = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                   HR%INCCO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                   HR%INCO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                   HR%INCHCN = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                   HR%INCVIS = VISIBILITY_FACTOR/(EVAC_MASS_EXTINCTION_COEFF*1.0E-6_EB*HUMAN_GRID(II,JJ)%SOOT_DENS) ! losa: incapacitating quantity
                 END IF
              ELSE ! From an entr line
                 HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
            	HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (FTD) concept
+                HR%INCTMP = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                HR%INCRAD = HR%RADFLUX ! losa: incapacitating quantity
+                HR%INCCO = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                HR%INCCO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                HR%INCO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                HR%INCHCN = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                HR%INCVIS = VISIBILITY_FACTOR/(EVAC_MASS_EXTINCTION_COEFF*1.0E-6_EB*HUMAN_GRID(II,JJ)%SOOT_DENS) ! losa: incapacitating quantity
              END IF
              ! Smoke density vs speed
              ! Lund 2003, report 3126 (Frantzich & Nilsson)
@@ -8852,6 +8902,19 @@ CONTAINS
              GATH = 0.0_EB
              A_WALL = 0.0_EB
           END IF
+          IF ( HR%IncTmp>=INC_LIM_TMP ) THEN ! losa: begin if, incapacitation limits
+             IF (L_FALLEN_DOWN) n_dead_tmp=n_dead_tmp-1 ! losa: incapacitation limits, death counter
+             n_dead_tmp=n_dead_tmp+1 ! losa: incapacitation limits, death counter
+          END IF ! losa: end if, incapacitation limits
+          IF ( HR%IncRad>=INC_LIM_RAD ) THEN ! losa: begin if, incapacitation limits
+             IF (L_FALLEN_DOWN) n_dead_rad=n_dead_rad-1 ! losa: incapacitation limits, death counter
+             n_dead_rad=n_dead_rad+1 ! losa: incapacitation limits, death counter
+          END IF ! losa: end if, incapacitation limits
+          IF ( HR%IncVis>=INC_LIM_VIS ) THEN ! losa: begin if, incapacitation limits
+             IF (L_FALLEN_DOWN) n_dead_vis=n_dead_vis-1 ! losa: incapacitation limits, death counter
+             n_dead_vis=n_dead_vis+1 ! losa: incapacitation limits, death counter
+          END IF ! losa: end if, incapacitation limits
+          ! losa: todo: missing conditions for HR%IncCO=INC_LIM_CO,HR%IncCO2=INC_LIM_CO2,HR%IncO2=INC_LIM_O2,HR%IncHCN=INC_LIM_HCN
           L_DEAD  = .FALSE.
           IF (HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB) THEN ! losa: purser's fractional thermal dose (FTD) concept
              L_DEAD = .TRUE.
@@ -12237,6 +12300,19 @@ CONTAINS
             INODE = PCX%INODE
             INODE2 = PCX%INODE2
             HR => NOW_LL%HUMAN
+          IF ( HR%IncTmp>=INC_LIM_TMP ) THEN ! losa: begin if, incapacitation limits
+             IF (L_FALLEN_DOWN) n_dead_tmp=n_dead_tmp-1 ! losa: incapacitation limits, death counter
+             n_dead_tmp=n_dead_tmp+1 ! losa: incapacitation limits, death counter
+          END IF ! losa: end if, incapacitation limits
+          IF ( HR%IncRad>=INC_LIM_RAD ) THEN ! losa: begin if, incapacitation limits
+             IF (L_FALLEN_DOWN) n_dead_rad=n_dead_rad-1 ! losa: incapacitation limits, death counter
+             n_dead_rad=n_dead_rad+1 ! losa: incapacitation limits, death counter
+          END IF ! losa: end if, incapacitation limits
+          IF ( HR%IncVis>=INC_LIM_VIS ) THEN ! losa: begin if, incapacitation limits
+             IF (L_FALLEN_DOWN) n_dead_vis=n_dead_vis-1 ! losa: incapacitation limits, death counter
+             n_dead_vis=n_dead_vis+1 ! losa: incapacitation limits, death counter
+          END IF ! losa: end if, incapacitation limits
+          ! losa: todo: missing conditions for HR%IncCO=INC_LIM_CO,HR%IncCO2=INC_LIM_CO2,HR%IncO2=INC_LIM_O2,HR%IncHCN=INC_LIM_HCN
             IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (FTD) concept
                IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                   N_DEAD = N_DEAD+1
@@ -15175,7 +15251,7 @@ CONTAINS
     END DO
     ii_density = ii
     !
-    IF (n_dead >= 0) THEN
+    IF (n_dead >= 0 .OR. n_dead_tmp >= 0 .OR. n_dead_co >= 0 .OR. n_dead_co2 >= 0 .OR. n_dead_o2 >= 0 .OR. n_dead_hcn >= 0 .OR. n_dead_vis >= 0 .OR. n_dead_rad >= 0) THEN ! losa: incapacitation limits
        ! Write the 'fed' columns
        IF (ii_density > ii_ntargets) THEN
           WRITE(tcform,'(a,i4.4,a,a,i4.4,a,a)') "(ES13.5E3,", n_cols, "(',',i8)", "," , &
@@ -15189,7 +15265,7 @@ CONTAINS
                (ITEMP(i), i = ii_ntargets+1,ii_density), &
                n_dead, fed_max, fed_max_alive, & ! losa: new line
                ftd_max, ftd_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
-               N_INC_TMP, N_INC_CO, N_INC_CO2, N_INC_O2, N_INC_HCN, N_INC_VIS, N_INC_RAD ! losa: incapacitation limits
+               n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad ! losa: incapacitation limits
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
                "(',',i8)", ",',',ES13.5E3,',',ES13.5E3,2(',',ES13.5E3),7(',',i8))" ! losa: adding output columns to format
@@ -15201,7 +15277,7 @@ CONTAINS
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                n_dead, fed_max, fed_max_alive, & ! losa: new line
                ftd_max, ftd_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
-               N_INC_TMP, N_INC_CO, N_INC_CO2, N_INC_O2, N_INC_HCN, N_INC_VIS, N_INC_RAD ! losa: incapacitation limits
+               n_dead_tmp, n_dead_co, n_dead_co2, n_dead_o2, n_dead_hcn, n_dead_vis, n_dead_rad ! losa: incapacitation limits
        END IF
     ELSE
        ! Do not write the 'fed' columns
