@@ -5773,7 +5773,7 @@ CONTAINS
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
                'Number_of_Deads','FED_max','FED_max_alive', & ! losa: new line
                'FTD_max','FTD_max_alive', & ! losa: purser's fractional thermal dose (FTD) concept
-               'LIM_N_dead','LIM_TMP_max_alive','LIM_RAD_max_alive','LIM_CO_max_alive','LIM_CO2_max_alive','LIM_O2_min_alive','LIM_HCN__max_alive','LIM_VIS_min_alive' ! losa: incapacitation limits
+               'LIM_dead','TMP_max_alive','RAD_max_alive','CO_max_alive','CO2_max_alive','O2_min_alive','HCN_max_alive','VIS_min_alive' ! losa: incapacitation limits
        ELSE
           ! Do not write the 'fed' columns
           OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='replace')
@@ -8079,9 +8079,9 @@ CONTAINS
              lim_rad = MAX(lim_rad,HR%LimRad) ! losa: max of incapacitating quantity of living agent
              lim_co = MAX(lim_co,HR%LimCO) ! losa: max of incapacitating quantity of living agent
              lim_co2 = MAX(lim_co,HR%LimCO2) ! losa: max of incapacitating quantity of living agent
-             lim_o2 = MAX(lim_o2,HR%LimO2) ! losa: max of incapacitating quantity of living agent
+             lim_o2 = MIN(lim_o2,HR%LimO2) ! losa: max of incapacitating quantity of living agent
              lim_hcn = MAX(lim_hcn,HR%LimHCN) ! losa: max of incapacitating quantity of living agent
-             lim_vis = MAX(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
+             lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
           END IF ! losa: end if, incapacitation limits
           ! losa: todo: missing conditions for HR%LimCO>=LIM_INC_CO,HR%LimCO2>=LIM_INC_CO2,HR%LimO2>=LIM_INC_O2,HR%LimHCN>=LIM_INC_HCN
           L_DEAD = .FALSE.
@@ -8894,9 +8894,9 @@ CONTAINS
              lim_rad = MAX(lim_rad,HR%LimRad) ! losa: max of incapacitating quantity of living agent
              lim_co = MAX(lim_co,HR%LimCO) ! losa: max of incapacitating quantity of living agent
              lim_co2 = MAX(lim_co,HR%LimCO2) ! losa: max of incapacitating quantity of living agent
-             lim_o2 = MAX(lim_o2,HR%LimO2) ! losa: max of incapacitating quantity of living agent
+             lim_o2 = MIN(lim_o2,HR%LimO2) ! losa: max of incapacitating quantity of living agent
              lim_hcn = MAX(lim_hcn,HR%LimHCN) ! losa: max of incapacitating quantity of living agent
-             lim_vis = MAX(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
+             lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
           END IF ! losa: end if, incapacitation limits
           ! losa: todo: missing conditions for HR%LimCO>=LIM_INC_CO,HR%LimCO2>=LIM_INC_CO2,HR%LimO2>=LIM_INC_O2,HR%LimHCN>=LIM_INC_HCN
           L_DEAD  = .FALSE.
@@ -12293,9 +12293,9 @@ CONTAINS
                lim_rad = MAX(lim_rad,HR%LimRad) ! losa: max of incapacitating quantity of living agent
                lim_co = MAX(lim_co,HR%LimCO) ! losa: max of incapacitating quantity of living agent
                lim_co2 = MAX(lim_co,HR%LimCO2) ! losa: max of incapacitating quantity of living agent
-               lim_o2 = MAX(lim_o2,HR%LimO2) ! losa: max of incapacitating quantity of living agent
+               lim_o2 = MIN(lim_o2,HR%LimO2) ! losa: max of incapacitating quantity of living agent
                lim_hcn = MAX(lim_hcn,HR%LimHCN) ! losa: max of incapacitating quantity of living agent
-               lim_vis = MAX(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
+               lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
             END IF ! losa: end if, incapacitation limits
             ! losa: todo: missing conditions for HR%LimCO>=LIM_INC_CO,HR%LimCO2>=LIM_INC_CO2,HR%LimO2>=LIM_INC_O2,HR%LimHCN>=LIM_INC_HCN
             IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (FTD) concept
