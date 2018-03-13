@@ -6557,14 +6557,14 @@ CONTAINS
              HR%SumForces = 0.0_EB
              HR%SumForces2 = 0.0_EB
              HR%IntDose   = 0.0_EB
-             HR%IncTmp   = 0.0_EB ! losa: incapacitation limits
-             HR%IncRad   = 0.0_EB ! losa: incapacitation limits
-             HR%IncCO   = 0.0_EB ! losa: incapacitation limits
-             HR%IncCO2   = 0.0_EB ! losa: incapacitation limits
-             HR%IncO2   = 0.0_EB ! losa: incapacitation limits
-             HR%IncHCN   = 0.0_EB ! losa: incapacitation limits
-             HR%IncVis   = 0.0_EB ! losa: incapacitation limits
              HR%TmpDose   = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
+!             HR%IncTmp   = 0.0_EB ! losa: incapacitation limits
+!             HR%IncRad   = 0.0_EB ! losa: incapacitation limits
+!             HR%IncCO   = 0.0_EB ! losa: incapacitation limits
+!             HR%IncCO2   = 0.0_EB ! losa: incapacitation limits
+!             HR%IncO2   = 0.0_EB ! losa: incapacitation limits
+!             HR%IncHCN   = 0.0_EB ! losa: incapacitation limits
+!             HR%IncVis   = 0.0_EB ! losa: incapacitation limits
              HR%Eta       = 0.0_EB
              HR%Ksi       = 0.0_EB
              HR%NewRnd    = .TRUE.
@@ -8098,19 +8098,19 @@ CONTAINS
           IF ( HR%IncTmp>=INC_LIM_TMP ) THEN ! losa: begin if, incapacitation limits
              IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                 IF (L_FALLEN_DOWN) n_dead_tmp=n_dead_tmp-1 ! losa: incapacitation limits, death counter
-                n_dead_tmp=n_dead_tmp+1 ! losa: incapacitation limits, death counter
+                n_dead_tmp=n_dead_tmp+1-1 ! losa: incapacitation limits, death counter
              END IF
           END IF ! losa: end if, incapacitation limits
           IF ( HR%IncRad>=INC_LIM_RAD ) THEN ! losa: begin if, incapacitation limits
              IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                 IF (L_FALLEN_DOWN) n_dead_rad=n_dead_rad-1 ! losa: incapacitation limits, death counter
-                n_dead_rad=n_dead_rad+1 ! losa: incapacitation limits, death counter
+                n_dead_rad=n_dead_rad+1-1 ! losa: incapacitation limits, death counter
              END IF
           END IF ! losa: end if, incapacitation limits
           IF ( HR%IncVis>=INC_LIM_VIS ) THEN ! losa: begin if, incapacitation limits
              IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                 IF (L_FALLEN_DOWN) n_dead_vis=n_dead_vis-1 ! losa: incapacitation limits, death counter
-                n_dead_vis=n_dead_vis+1 ! losa: incapacitation limits, death counter
+                n_dead_vis=n_dead_vis+1-1 ! losa: incapacitation limits, death counter
              END IF
           END IF ! losa: end if, incapacitation limits
           ! losa: todo: missing conditions for HR%IncCO=INC_LIM_CO,HR%IncCO2=INC_LIM_CO2,HR%IncO2=INC_LIM_O2,HR%IncHCN=INC_LIM_HCN
@@ -8918,19 +8918,19 @@ CONTAINS
           IF ( HR%IncTmp>=INC_LIM_TMP ) THEN ! losa: begin if, incapacitation limits
              IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                 IF (L_FALLEN_DOWN) n_dead_tmp=n_dead_tmp-1 ! losa: incapacitation limits, death counter
-                n_dead_tmp=n_dead_tmp+1 ! losa: incapacitation limits, death counter
+                n_dead_tmp=n_dead_tmp+1-1 ! losa: incapacitation limits, death counter
              END IF
           END IF ! losa: end if, incapacitation limits
           IF ( HR%IncRad>=INC_LIM_RAD ) THEN ! losa: begin if, incapacitation limits
              IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                 IF (L_FALLEN_DOWN) n_dead_rad=n_dead_rad-1 ! losa: incapacitation limits, death counter
-                n_dead_rad=n_dead_rad+1 ! losa: incapacitation limits, death counter
+                n_dead_rad=n_dead_rad+1-1 ! losa: incapacitation limits, death counter
              END IF
           END IF ! losa: end if, incapacitation limits
           IF ( HR%IncVis>=INC_LIM_VIS ) THEN ! losa: begin if, incapacitation limits
              IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                 IF (L_FALLEN_DOWN) n_dead_vis=n_dead_vis-1 ! losa: incapacitation limits, death counter
-                n_dead_vis=n_dead_vis+1 ! losa: incapacitation limits, death counter
+                n_dead_vis=n_dead_vis+1-1 ! losa: incapacitation limits, death counter
              END IF
           END IF ! losa: end if, incapacitation limits
           ! losa: todo: missing conditions for HR%IncCO=INC_LIM_CO,HR%IncCO2=INC_LIM_CO2,HR%IncO2=INC_LIM_O2,HR%IncHCN=INC_LIM_HCN
@@ -12321,17 +12321,17 @@ CONTAINS
             HR => NOW_LL%HUMAN
           IF ( HR%IncTmp>=INC_LIM_TMP ) THEN ! losa: begin if, incapacitation limits
              IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
-                n_dead_tmp=n_dead_tmp+1 ! losa: incapacitation limits, death counter
+                n_dead_tmp=n_dead_tmp+1-1 ! losa: incapacitation limits, death counter
              END IF
           END IF ! losa: end if, incapacitation limits
           IF ( HR%IncRad>=INC_LIM_RAD ) THEN ! losa: begin if, incapacitation limits
              IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
-                n_dead_rad=n_dead_rad+1 ! losa: incapacitation limits, death counter
+                n_dead_rad=n_dead_rad+1-1 ! losa: incapacitation limits, death counter
              END IF
           END IF ! losa: end if, incapacitation limits
           IF ( HR%IncVis>=INC_LIM_VIS ) THEN ! losa: begin if, incapacitation limits
              IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
-                n_dead_vis=n_dead_vis+1 ! losa: incapacitation limits, death counter
+                n_dead_vis=n_dead_vis+1-1 ! losa: incapacitation limits, death counter
              END IF
           END IF ! losa: end if, incapacitation limits
           ! losa: todo: missing conditions for HR%IncCO=INC_LIM_CO,HR%IncCO2=INC_LIM_CO2,HR%IncO2=INC_LIM_O2,HR%IncHCN=INC_LIM_HCN
