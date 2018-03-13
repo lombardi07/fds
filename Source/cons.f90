@@ -5,8 +5,9 @@ MODULE GLOBAL_CONSTANTS
 USE PRECISION_PARAMETERS
 IMPLICIT NONE
 
-REAL(EB) :: LIM_INC_TMP,LIM_INC_RAD,LIM_INC_CO,LIM_INC_CO2,LIM_INC_O2,LIM_INC_HCN,LIM_INC_VIS ! losa: input variables definition
-INTEGER :: LIM_N_DEAD=0,LIM_TMP=0,LIM_RAD=0,LIM_CO=0,LIM_CO2=0,LIM_O2=0,LIM_HCN=0,LIM_VIS=0 ! losa: number of incapacitated agents
+REAL(EB) :: LIM_INC_TMP,LIM_INC_RAD,LIM_INC_CO,LIM_INC_CO2,LIM_INC_O2,LIM_INC_HCN,LIM_INC_VIS ! losa: input variables, definition of incapacitating limits
+REAL(EB) :: LIM_TMP,LIM_RAD,LIM_CO,LIM_CO2,LIM_O2,LIM_HCN,LIM_VIS ! losa: store max alive quantity of incapacitating substances
+INTEGER  :: LIM_N_DEAD=0 ! losa: output number of dead agents due incapacitating limits
 
 ! Indices for various modes of operation
 
