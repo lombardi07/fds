@@ -1651,7 +1651,7 @@ NAMELIST /MISC/ AGGLOMERATION,AEROSOL_AL2O3,ALLOW_SURFACE_PARTICLES,ALLOW_UNDERS
                 WIND_ONLY,& ! losa: new line
                 LIM_INC_TMP,LIM_INC_RAD,LIM_INC_CO,LIM_INC_CO2,LIM_INC_O2,LIM_INC_HCN,LIM_INC_VIS ! losa: use incapacitation limits in misc namelist
 
-! losa: constants
+! losa: define default value of incapacitating limits
 
 LIM_INC_TMP  = 80._EB ! losa: define default for temperature (°C)
 LIM_INC_RAD  = 2000._EB ! losa: define default for radiation (kW/m2)
