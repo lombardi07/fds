@@ -6557,6 +6557,13 @@ CONTAINS
              HR%SumForces = 0.0_EB
              HR%SumForces2 = 0.0_EB
              HR%IntDose   = 0.0_EB
+             HR%IncTmp   = 0.0_EB ! losa: incapacitation limits
+             HR%IncRad   = 0.0_EB ! losa: incapacitation limits
+             HR%IncCO   = 0.0_EB ! losa: incapacitation limits
+             HR%IncCO2   = 0.0_EB ! losa: incapacitation limits
+             HR%IncO2   = 0.0_EB ! losa: incapacitation limits
+             HR%IncHCN   = 0.0_EB ! losa: incapacitation limits
+             HR%IncVis   = 0.0_EB ! losa: incapacitation limits
              HR%TmpDose   = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
              HR%Eta       = 0.0_EB
              HR%Ksi       = 0.0_EB
