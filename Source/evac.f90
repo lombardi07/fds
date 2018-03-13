@@ -8208,7 +8208,7 @@ CONTAINS
                    HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
                    HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (FTD) concept
                    HR%INCTMP = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
-                   HR%INCRAD = HR%RADFLUX ! losa: incapacitating quantity
+                   HR%INCRAD = HUMAN_GRID(II,JJ)%RADFLUX ! losa: incapacitating quantity
                    HR%INCCO = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
                    HR%INCCO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
                    HR%INCO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
@@ -8219,7 +8219,7 @@ CONTAINS
                 HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
            	HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (FTD) concept
                 HR%INCTMP = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
-                HR%INCRAD = HR%RADFLUX ! losa: incapacitating quantity
+                HR%INCRAD = HUMAN_GRID(II,JJ)%RADFLUX ! losa: incapacitating quantity
                 HR%INCCO = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
                 HR%INCCO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
                 HR%INCO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
