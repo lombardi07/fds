@@ -8071,7 +8071,7 @@ CONTAINS
                 CYCLE HoleFallLoop
              END IF
           END DO HoleFallLoop
-          IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
+          IF (HR%LimTmp>=LIM_INC_TMP)! .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
              IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
              lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
              HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
@@ -8886,7 +8886,7 @@ CONTAINS
              GATH = 0.0_EB
              A_WALL = 0.0_EB
           END IF
-          IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
+          IF (HR%LimTmp>=LIM_INC_TMP)! .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
              IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
              lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
              HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
@@ -12285,7 +12285,7 @@ CONTAINS
             INODE = PCX%INODE
             INODE2 = PCX%INODE2
             HR => NOW_LL%HUMAN
-            IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
+            IF (HR%LimTmp>=LIM_INC_TMP)! .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
                IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
                lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
                HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
@@ -15263,7 +15263,7 @@ CONTAINS
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                n_dead, fed_max, fed_max_alive, & ! losa: new line
                ftd_max,ftd_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
-               lim_n_dead,LIM_INC_TMP,LIM_INC_RAD,LIM_INC_VIS,lim_co2,lim_o2,lim_hcn,lim_vis ! losa: incapacitation limits
+               lim_n_dead,lim_tmp,lim_rad,lim_co,lim_co2,lim_o2,lim_hcn,lim_vis ! losa: incapacitation limits
        END IF
     ELSE
        ! Do not write the 'fed' columns
