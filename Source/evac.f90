@@ -5773,7 +5773,8 @@ CONTAINS
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
                'Number_of_Deads','FED_max','FED_max_alive', & ! losa: new line
                'FTD_max','FTD_max_alive', & ! losa: purser's fractional thermal dose (FTD) concept
-               'LIM_dead','TMP_max_alive','RAD_max_alive','CO_max_alive','CO2_max_alive','O2_min_alive','HCN_max_alive','VIS_min_alive' ! losa: incapacitation limits
+               'LIM_dead','TMP_max_alive','RAD_max_alive','CO_max_alive','CO2_max_alive','O2_min_alive', &
+               'HCN_max_alive','VIS_min_alive' ! losa: incapacitation limits
        ELSE
           ! Do not write the 'fed' columns
           OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='replace')
