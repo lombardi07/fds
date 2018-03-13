@@ -15240,8 +15240,8 @@ CONTAINS
     IF (n_dead>=0 .OR. lim_n_dead>=0) THEN ! losa: incapacitation limits
        ! Write the 'fed' columns
        IF (ii_density > ii_ntargets) THEN
-          WRITE(tcform,'(a,i4.4,a,a,i4.4,a,a,a)') "(ES13.5E3,", n_cols, "(',',i8)", "," , & ! losa: text type "a" for new entries
-               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',4(',',ES13.5E3),1(',',i8),7(',',ES13.5E3))" ! losa: adding output columns to format
+          WRITE(tcform,'(a,i4.4,a,a,i4.4,a,a)') "(ES13.5E3,", n_cols, "(',',i8)", "," , &
+               ii_density-ii_ntargets, "(',',ES13.5E3)", ",',',i8,',',4(',',ES13.5E3),',',i8,7(',',ES13.5E3))" ! losa: adding output columns to format
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
@@ -15253,8 +15253,8 @@ CONTAINS
                ftd_max,ftd_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
                lim_n_dead,lim_tmp,lim_rad,lim_co,lim_co2,lim_o2,lim_hcn,lim_vis ! losa: incapacitation limits
        ELSE
-          WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, & ! losa: text type "a" for new entries
-               "(',',i8)", ",',',4(',',ES13.5E3),1(',',i8),7(',',ES13.5E3))" ! losa: adding output columns to format
+          WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
+               "(',',i8)", ",',',4(',',ES13.5E3),',',i8,7(',',ES13.5E3))" ! losa: adding output columns to format
           WRITE (LU_EVACCSV,fmt=tcform) Tin, n_tot_humans, &
                (MESHES(EVAC_Node_List(i)%IMESH)%N_HUMANS, i=1,n_egrids), &
                (EVAC_CORRS(i)%n_inside, i = 1,n_corrs), &
