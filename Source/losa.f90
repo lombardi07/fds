@@ -46,5 +46,7 @@
 ! cumulable.
 ! in the concept of limits the first incapacitating quantity that reaches its limit flags the
 ! corresponding agent as dead. this concept is implemented without altering the behaviour of
-! agents in EVAC.
+! agents in EVAC. concentrations of narcotic substances (CO, CO2, O2, HCN) are extracted from
+! the fire calculation through the function "GET_FIRE_CONDITIONS". data of the "HUMAN_GRID" is
+! saved on the disk, while concentrations from "EVAC_CORRS" are dumped.
 ! outputs are written in the *evac.csv file.
