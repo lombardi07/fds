@@ -2880,13 +2880,12 @@ ENDDO
 END SUBROUTINE SPRAY_ANGLE_DISTRIBUTION
 
 
-REAL(EB) FUNCTION FED(Y_IN,RSUM,FED_ACTIVITY,LIM_C_CO) ! losa: get concentrations
+REAL(EB) FUNCTION FED(Y_IN,RSUM,FED_ACTIVITY)
 
 ! Returns the integrand of FED (Fractional Effective Dose) calculation.
 
 REAL(EB), INTENT(IN) :: Y_IN(1:N_TRACKED_SPECIES),RSUM
 INTEGER, INTENT(IN)  :: FED_ACTIVITY
-REAL(EB), INTENT(OUT):: LIM_C_CO ! losa: get concentrations
 INTEGER  :: N
 REAL(EB) :: Y_MF_INT, TMP_1
 REAL(EB), DIMENSION(3) :: CO_FED_FAC
@@ -2899,7 +2898,6 @@ DATA CO_FED_FAC /0.70486250E-5_EB, 2.7641667E-5_EB,    8.2925E-5_EB/
 ! FED_dose = (FED_LCO + FED_LCN + FED_LNOx + FLD_irr)*FED_VCO2 + FED_LO2;
 
 FED = 0._EB
-LIM_C_CO = 0._EB ! losa: get concentrations
 
 ! Carbon monoxide (CO)
 !          at rest    light work heavy work
@@ -2915,7 +2913,6 @@ IF (CO_INDEX > 0) THEN
    TMP_1 = SPECIES(CO_INDEX)%RCON*Y_MF_INT*1.E6_EB/RSUM
    ! FED   = 2.764E-5_EB*TMP_1**(1.036_EB)
    FED   = CO_FED_FAC(FED_ACTIVITY)*TMP_1**(1.036_EB)
-   LIM_C_CO = SPECIES(CO_INDEX)%RCON*Y_MF_INT*1.E6_EB/RSUM ! losa: get concentrations
 ENDIF
 
 ! Nitrogen oxides (NOx, here NO + NO2)
