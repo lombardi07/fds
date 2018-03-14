@@ -8085,7 +8085,7 @@ CONTAINS
                 CYCLE HoleFallLoop
              END IF
           END DO HoleFallLoop
-          IF (HR%LimRad>=LIM_INC_RAD) THEN! HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
+          IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
              IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
              lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
              HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
@@ -8900,7 +8900,7 @@ CONTAINS
              GATH = 0.0_EB
              A_WALL = 0.0_EB
           END IF
-          IF (HR%LimRad>=LIM_INC_RAD) THEN! HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
+          IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
              IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
              lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
              HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
@@ -12299,7 +12299,7 @@ CONTAINS
             INODE = PCX%INODE
             INODE2 = PCX%INODE2
             HR => NOW_LL%HUMAN
-            IF (HR%LimRad>=LIM_INC_RAD) THEN! HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
+            IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis>=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
                IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
                lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
                HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
