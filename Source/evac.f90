@@ -15290,7 +15290,7 @@ CONTAINS
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                n_dead, fed_max, fed_max_alive, & ! losa: new line
                ted_max,ted_max_alive, & ! losa: purser's fractional thermal dose (TED) concept
-               co_index,lim_tmp,lim_rad,lim_co,lim_co2,lim_o2,lim_hcn,lim_vis ! losa: incapacitation limits
+               lim_n_dead,lim_tmp,lim_rad,lim_co,lim_co2,lim_o2,lim_hcn,lim_vis ! losa: incapacitation limits
        END IF
     ELSE
        ! Do not write the 'fed' columns
@@ -15863,25 +15863,25 @@ CONTAINS
     ! losa: get substance concentrations
     IF (CO_INDEX > 0) THEN ! losa: get concentration of CO
        Call GET_MASS_FRACTION(ZZ_GET,CO_INDEX,Y_MF_INT) ! losa: get concentration of CO
-       C_CO = SPECIES(CO_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of CO
+       C_CO = Y_MF_INT*1.E6_EB ! losa: get concentration of CO
     ELSE ! losa: get concentration of CO
        C_CO = 0._EB ! losa: get concentration of CO
     ENDIF ! losa: get concentration of CO2
     IF (CO2_INDEX > 0) THEN ! losa: get concentration of CO2
        Call GET_MASS_FRACTION(ZZ_GET,CO2_INDEX,Y_MF_INT) ! losa: get concentration of CO2
-       C_CO2 = SPECIES(CO2_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of CO2
+       C_CO2 = Y_MF_INT*1.E6_EB ! losa: get concentration of CO2
     ELSE ! losa: get concentration of CO2
        C_CO2 = 0._EB ! losa: get concentration of CO2
     ENDIF ! losa: get concentration of CO2
     IF (O2_INDEX > 0) THEN ! losa: get concentration of O2 (volume per cent)
        Call GET_MASS_FRACTION(ZZ_GET,O2_INDEX,Y_MF_INT) ! losa: get concentration of O2 (volume per cent)
-       C_O2 = SPECIES(O2_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of O2 (volume per cent)
+       C_O2 = Y_MF_INT*100.0_EB ! losa: get concentration of O2 (volume per cent)
     ELSE ! losa: get concentration of O2 (volume per cent)
        C_O2 = 0._EB ! losa: get concentration of O2 (volume per cent)
     ENDIF ! losa: get concentration of O2 (volume per cent)
     IF (HCN_INDEX > 0) THEN ! losa: get concentration of HCN
        Call GET_MASS_FRACTION(ZZ_GET,HCN_INDEX,Y_MF_INT) ! losa: get concentration of HCN
-       C_HCN = SPECIES(HCN_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of HCN
+       C_HCN = Y_MF_INT*1.E6_EB ! losa: get concentration of HCN
     ELSE ! losa: get concentration of HCN
        C_HCN = 0._EB ! losa: get concentration of HCN
     ENDIF ! losa: get concentration of HCN
