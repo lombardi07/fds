@@ -6,6 +6,7 @@ USE PRECISION_PARAMETERS
 IMPLICIT NONE
 
 REAL(EB) :: LIM_INC_TMP,LIM_INC_RAD,LIM_INC_CO,LIM_INC_CO2,LIM_INC_O2,LIM_INC_HCN,LIM_INC_VIS ! losa: input variables, definition of incapacitating limits
+REAL(EB) :: LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN ! losa: variables for concentration of substances
 REAL(EB) :: LIM_TMP,LIM_RAD,LIM_CO,LIM_CO2,LIM_O2,LIM_HCN,LIM_VIS ! losa: store max alive quantity of incapacitating substances
 INTEGER  :: LIM_N_DEAD=0 ! losa: output number of dead agents due incapacitating limits
 
