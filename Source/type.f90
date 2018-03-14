@@ -649,6 +649,7 @@ TYPE HUMAN_GRID_TYPE
 ! SOOT_DENS: Smoke density at the center of the cell (mg/m3)
 ! FED_CO_CO2_O2: Purser's FED for co, co2, and o2
    REAL(EB) :: X,Y,Z,SOOT_DENS,FED_CO_CO2_O2,TMP_G,RADFLUX
+   REAL(EB) :: LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN ! losa: variables for concentration of substances
    INTEGER :: N, N_old, IGRID, IHUMAN, ILABEL
 ! IMESH: (x,y,z) which fire mesh, if any
 ! II,JJ,KK: Fire mesh cell reference
