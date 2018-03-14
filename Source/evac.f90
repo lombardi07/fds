@@ -8203,10 +8203,10 @@ CONTAINS
                    HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (TED) concept
                    HR%LimTmp = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
                    HR%LimRad = HUMAN_GRID(II,JJ)%RADFLUX ! losa: incapacitating quantity
-                   HR%LimCO = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
-                   HR%LimCO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
-                   HR%LimO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
-                   HR%LimHCN = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                   HR%LimCO = LIM_C_CO ! losa: incapacitating quantity
+                   HR%LimCO2 = LIM_C_CO2 ! losa: incapacitating quantity
+                   HR%LimO2 = LIM_C_O2 ! losa: incapacitating quantity
+                   HR%LimHCN = LIM_C_HCN ! losa: incapacitating quantity
                    HR%LimVis = VISIBILITY_FACTOR/(EVAC_MASS_EXTINCTION_COEFF*1.0E-6_EB*HUMAN_GRID(II,JJ)%SOOT_DENS) ! losa: incapacitating quantity
                 END IF
              ELSE ! From an entr line
@@ -8214,10 +8214,10 @@ CONTAINS
            	HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (TED) concept
                 HR%LimTmp = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
                 HR%LimRad = HUMAN_GRID(II,JJ)%RADFLUX ! losa: incapacitating quantity
-                HR%LimCO = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
-                HR%LimCO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
-                HR%LimO2 = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
-                HR%LimHCN = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
+                HR%LimCO = LIM_C_CO ! losa: incapacitating quantity
+                HR%LimCO2 = LIM_C_CO2 ! losa: incapacitating quantity
+                HR%LimO2 = LIM_C_O2 ! losa: incapacitating quantity
+                HR%LimHCN = LIM_C_HCN ! losa: incapacitating quantity
                 HR%LimVis = VISIBILITY_FACTOR/(EVAC_MASS_EXTINCTION_COEFF*1.0E-6_EB*HUMAN_GRID(II,JJ)%SOOT_DENS) ! losa: incapacitating quantity
              END IF
              ! Smoke density vs speed
