@@ -7001,7 +7001,7 @@ CONTAINS
                       CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                            HUMAN_GRID(I,J)%FED_CO_CO2_O2,HUMAN_GRID(I,J)%SOOT_DENS,&
                            HUMAN_GRID(I,J)%TMP_G, HUMAN_GRID(I,J)%RADFLUX, ZZ_GET, FED_ACTIVITY,& ! losa: new line
-                           LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN) ! losa: get concentrations
+                           HUMAN_GRID(I,J)%LIM_C_CO,HUMAN_GRID(I,J)%LIM_C_CO2,HUMAN_GRID(I,J)%LIM_C_O2,HUMAN_GRID(I,J)%LIM_C_HCN) ! losa: get concentrations
                    END IF
                    ! Save FED, SOOT, TEMP(C), and RADFLUX
                    WRITE (LU_EVACFED) &
@@ -7046,7 +7046,7 @@ CONTAINS
                 CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                      EVAC_CORRS(I)%FED_CO_CO2_O2(1),EVAC_CORRS(I)%SOOT_DENS(1),&
                      EVAC_CORRS(I)%TMP_G(1), EVAC_CORRS(I)%RADFLUX(1), ZZ_GET, FED_ACTIVITY,& ! losa: new line
-                     LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN) ! losa: get concentrations
+                     HUMAN_GRID(I,J)%LIM_C_CO,HUMAN_GRID(I,J)%LIM_C_CO2,HUMAN_GRID(I,J)%LIM_C_O2,HUMAN_GRID(I,J)%LIM_C_HCN) ! losa: get concentrations
              ELSE
                 ! No FED_MESH found
                 EVAC_CORRS(I)%FED_CO_CO2_O2(1) = 0.0_EB
@@ -7063,7 +7063,7 @@ CONTAINS
                 CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                      EVAC_CORRS(I)%FED_CO_CO2_O2(2),EVAC_CORRS(I)%SOOT_DENS(2),&
                      EVAC_CORRS(I)%TMP_G(2), EVAC_CORRS(I)%RADFLUX(2), ZZ_GET, FED_ACTIVITY,& ! losa: new line
-                     LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN) ! losa: get concentrations
+                     HUMAN_GRID(I,J)%LIM_C_CO,HUMAN_GRID(I,J)%LIM_C_CO2,HUMAN_GRID(I,J)%LIM_C_O2,HUMAN_GRID(I,J)%LIM_C_HCN) ! losa: get concentrations
              ELSE
                 ! No FED_MESH2 found
                 EVAC_CORRS(I)%FED_CO_CO2_O2(2) = 0.0_EB
@@ -8208,10 +8208,10 @@ CONTAINS
                    ENDIF ! losa: purser's fractional thermal dose (TED) concept
                    HR%LimTmp = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
                    HR%LimRad = HUMAN_GRID(II,JJ)%RADFLUX ! losa: incapacitating quantity
-                   HR%LimCO = LIM_C_CO ! losa: incapacitating quantity
-                   HR%LimCO2 = LIM_C_CO2 ! losa: incapacitating quantity
-                   HR%LimO2 = LIM_C_O2 ! losa: incapacitating quantity
-                   HR%LimHCN = LIM_C_HCN ! losa: incapacitating quantity
+                   HR%LimCO = HUMAN_GRID(II,JJ)%LIM_C_CO ! losa: incapacitating quantity
+                   HR%LimCO2 = HUMAN_GRID(II,JJ)%LIM_C_CO2 ! losa: incapacitating quantity
+                   HR%LimO2 = HUMAN_GRID(II,JJ)%LIM_C_O2 ! losa: incapacitating quantity
+                   HR%LimHCN = HUMAN_GRID(II,JJ)%LIM_C_HCN ! losa: incapacitating quantity
                    HR%LimVis = VISIBILITY_FACTOR/(EVAC_MASS_EXTINCTION_COEFF*1.0E-6_EB*HUMAN_GRID(II,JJ)%SOOT_DENS) ! losa: incapacitating quantity
                 END IF
              ELSE ! From an entr line
@@ -8224,10 +8224,10 @@ CONTAINS
                 ENDIF ! losa: purser's fractional thermal dose (TED) concept
                 HR%LimTmp = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
                 HR%LimRad = HUMAN_GRID(II,JJ)%RADFLUX ! losa: incapacitating quantity
-                HR%LimCO = LIM_C_CO ! losa: incapacitating quantity
-                HR%LimCO2 = LIM_C_CO2 ! losa: incapacitating quantity
-                HR%LimO2 = LIM_C_O2 ! losa: incapacitating quantity
-                HR%LimHCN = LIM_C_HCN ! losa: incapacitating quantity
+                HR%LimCO = HUMAN_GRID(II,JJ)%LIM_C_CO ! losa: incapacitating quantity
+                HR%LimCO2 = HUMAN_GRID(II,JJ)%LIM_C_CO2 ! losa: incapacitating quantity
+                HR%LimO2 = HUMAN_GRID(II,JJ)%LIM_C_O2 ! losa: incapacitating quantity
+                HR%LimHCN = HUMAN_GRID(II,JJ)%LIM_C_HCN ! losa: incapacitating quantity
                 HR%LimVis = VISIBILITY_FACTOR/(EVAC_MASS_EXTINCTION_COEFF*1.0E-6_EB*HUMAN_GRID(II,JJ)%SOOT_DENS) ! losa: incapacitating quantity
              END IF
              ! Smoke density vs speed
