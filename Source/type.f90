@@ -633,7 +633,7 @@ TYPE HUMAN_TYPE
    REAL(EB) :: SumForces=0._EB, IntDose=0._EB, DoseCrit1=0._EB, DoseCrit2=0._EB, SumForces2=0._EB
    REAL(EB) :: LimTmp=0._EB,LimRad=0._EB,LimCO=0._EB,LimCO2=0._EB,LimO2=100._EB,LimHCN=0._EB,LimVis=30._EB ! losa: incapacitating quantity
    LOGICAL  :: LimFallenDown=.FALSE. ! losa: incapacitation state of agent
-   REAL(EB) :: TmpDose=0._EB ! losa: purser's fractional thermal dose (FTD) concept
+   REAL(EB) :: TmpDose=0._EB ! losa: purser's fractional thermal dose (FED) concept
    REAL(EB) :: TempMax1=0._EB, FluxMax1=0._EB, TempMax2=0._EB, FluxMax2=0._EB, Density=0._EB, DensityR=0._EB, DensityL=0._EB
    REAL(EB) :: P_detect_tot=0._EB, v0_fac=1._EB, D_Walls=0._EB
    REAL(EB) :: T_FallenDown=0._EB, F_FallDown=0._EB, Angle_FallenDown=0._EB, SizeFac_FallenDown=0._EB, T_CheckFallDown=0._EB
