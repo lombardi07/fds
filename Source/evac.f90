@@ -8088,7 +8088,8 @@ CONTAINS
                 CYCLE HoleFallLoop
              END IF
           END DO HoleFallLoop
-          IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis<=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
+          IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis<=LIM_INC_VIS .OR. & ! losa: begin if, incapacitation limits
+               HR%LimCO>=LIM_INC_CO .OR. HR%LimCO2>=LIM_INC_CO2 .OR. HR%LimO2<=LIM_INC_O2 .OR. HR%LimHCN>=LIM_INC_HCN) THEN ! losa: begin if, incapacitation limits
              IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
              lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
              HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
@@ -8101,7 +8102,6 @@ CONTAINS
              lim_hcn = MAX(lim_hcn,HR%LimHCN) ! losa: max of incapacitating quantity of living agent
              lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
           END IF ! losa: end if, incapacitation limits
-          ! losa: todo: missing conditions for HR%LimCO>=LIM_INC_CO,HR%LimCO2>=LIM_INC_CO2,HR%LimO2>=LIM_INC_O2,HR%LimHCN>=LIM_INC_HCN
           L_DEAD = .FALSE.
           IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (TED) concept
              L_DEAD = .TRUE.
@@ -8913,7 +8913,8 @@ CONTAINS
              GATH = 0.0_EB
              A_WALL = 0.0_EB
           END IF
-          IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis<=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
+          IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis<=LIM_INC_VIS .OR. & ! losa: begin if, incapacitation limits
+               HR%LimCO>=LIM_INC_CO .OR. HR%LimCO2>=LIM_INC_CO2 .OR. HR%LimO2<=LIM_INC_O2 .OR. HR%LimHCN>=LIM_INC_HCN) THEN ! losa: begin if, incapacitation limits
              IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
              lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
              HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
@@ -8926,7 +8927,6 @@ CONTAINS
              lim_hcn = MAX(lim_hcn,HR%LimHCN) ! losa: max of incapacitating quantity of living agent
              lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
           END IF ! losa: end if, incapacitation limits
-          ! losa: todo: missing conditions for HR%LimCO>=LIM_INC_CO,HR%LimCO2>=LIM_INC_CO2,HR%LimO2>=LIM_INC_O2,HR%LimHCN>=LIM_INC_HCN
           L_DEAD  = .FALSE.
           IF (HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB) THEN ! losa: purser's fractional thermal dose (TED) concept
              L_DEAD = .TRUE.
@@ -12312,7 +12312,8 @@ CONTAINS
             INODE = PCX%INODE
             INODE2 = PCX%INODE2
             HR => NOW_LL%HUMAN
-            IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis<=LIM_INC_VIS) THEN ! losa: begin if, incapacitation limits
+            IF (HR%LimTmp>=LIM_INC_TMP .OR. HR%LimRad>=LIM_INC_RAD .OR. HR%LimVis<=LIM_INC_VIS .OR. & ! losa: begin if, incapacitation limits
+                 HR%LimCO>=LIM_INC_CO .OR. HR%LimCO2>=LIM_INC_CO2 .OR. HR%LimO2<=LIM_INC_O2 .OR. HR%LimHCN>=LIM_INC_HCN) THEN ! losa: begin if, incapacitation limits
                IF (HR%LimFallenDown) lim_n_dead=lim_n_dead-1 ! losa: don't double count deaths through inc. lim.
                lim_n_dead=lim_n_dead+1 ! losa: count incapacitation through limits
                HR%LimFallenDown=.TRUE. ! losa: change incapacitation state of agent
@@ -12325,7 +12326,6 @@ CONTAINS
                lim_hcn = MAX(lim_hcn,HR%LimHCN) ! losa: max of incapacitating quantity of living agent
                lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
             END IF ! losa: end if, incapacitation limits
-            ! losa: todo: missing conditions for HR%LimCO>=LIM_INC_CO,HR%LimCO2>=LIM_INC_CO2,HR%LimO2>=LIM_INC_O2,HR%LimHCN>=LIM_INC_HCN
             IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (TED) concept
                IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                   N_DEAD = N_DEAD+1
