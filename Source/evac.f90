@@ -7073,10 +7073,10 @@ CONTAINS
                 EVAC_CORRS(I)%SOOT_DENS(1) = 0.0_EB
                 EVAC_CORRS(I)%TMP_G(1) = 0.0_EB
                 EVAC_CORRS(I)%RADFLUX(1) = 0.0_EB
-                EVAC_CORRS(I)%LIM_C_CO(1) = 0.0_EB ! losa: save concentrations
-                EVAC_CORRS(I)%LIM_C_CO2(1) = 0.0_EB ! losa: save concentrations
-                EVAC_CORRS(I)%LIM_C_O2(1) = 0.0_EB ! losa: save concentrations
-                EVAC_CORRS(I)%LIM_C_HCN(1)) = 0.0_EB ! losa: save concentrations
+                !EVAC_CORRS(I)%LIM_C_CO(1) = 0.0_EB ! losa: save concentrations
+                !EVAC_CORRS(I)%LIM_C_CO2(1) = 0.0_EB ! losa: save concentrations
+                !EVAC_CORRS(I)%LIM_C_O2(1) = 0.0_EB ! losa: save concentrations
+                !EVAC_CORRS(I)%LIM_C_HCN(1)) = 0.0_EB ! losa: save concentrations
              END IF                ! FED_MESH > 0, i.e. fire grid found
 
              IF ( EVAC_CORRS(I)%FED_MESH2 > 0 .AND. .NOT.DISCARD_SMOKE_INFO) THEN
@@ -7094,10 +7094,10 @@ CONTAINS
                 EVAC_CORRS(I)%SOOT_DENS(2) = 0.0_EB
                 EVAC_CORRS(I)%TMP_G(2) = 0.0_EB
                 EVAC_CORRS(I)%RADFLUX(2) = 0.0_EB
-                EVAC_CORRS(I)%LIM_C_CO(2) = 0.0_EB ! losa: save concentrations
-                EVAC_CORRS(I)%LIM_C_CO2(2) = 0.0_EB ! losa: save concentrations
-                EVAC_CORRS(I)%LIM_C_O2(2) = 0.0_EB ! losa: save concentrations
-                EVAC_CORRS(I)%LIM_C_HCN(2)) = 0.0_EB ! losa: save concentrations
+                !EVAC_CORRS(I)%LIM_C_CO(2) = 0.0_EB ! losa: save concentrations
+                !EVAC_CORRS(I)%LIM_C_CO2(2) = 0.0_EB ! losa: save concentrations
+                !EVAC_CORRS(I)%LIM_C_O2(2) = 0.0_EB ! losa: save concentrations
+                !EVAC_CORRS(I)%LIM_C_HCN(2)) = 0.0_EB ! losa: save concentrations
              END IF                ! FED_MESH2 > 0, i.e. fire grid found
 
              ! Save FED, SOOT, TEMP(C), and RADFLUX
