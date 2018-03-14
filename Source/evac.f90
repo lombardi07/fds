@@ -197,6 +197,7 @@ MODULE EVAC
      INTEGER :: Elevator_Mode=1
      ! Note: Corridor may have 2 different points, where smoke etc. data is saved.
      REAL(EB), DIMENSION(2) :: FED_CO_CO2_O2=0._EB, SOOT_DENS=0._EB, TMP_G=0._EB, RADFLUX=0._EB
+     REAL(EB), DIMENSION(2) :: LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN ! losa: field variables for incapacitating limits
      INTEGER :: FED_MESH=0, FED_MESH2=0
      INTEGER, DIMENSION(2) :: II=0, JJ=0, KK=0
      INTEGER :: IOR=0, ICOUNT=0, INODE=0, INODE2=0, IMESH=0, IMESH2=0, IDOOR_FROM=0
@@ -7064,18 +7065,18 @@ CONTAINS
                 NOM = EVAC_CORRS(I)%FED_MESH
                 CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                      EVAC_CORRS(I)%FED_CO_CO2_O2(1),EVAC_CORRS(I)%SOOT_DENS(1),&
-                     EVAC_CORRS(I)%TMP_G(1), EVAC_CORRS(I)%RADFLUX(1), ZZ_GET, FED_ACTIVITY)!,& ! losa: new line
-                     !EVAC_CORRS(I)%LIM_C_CO(1),EVAC_CORRS(I)%LIM_C_CO2(1),EVAC_CORRS(I)%LIM_C_O2(1),EVAC_CORRS(I)%LIM_C_HCN(1)) ! losa: get concentrations
+                     EVAC_CORRS(I)%TMP_G(1), EVAC_CORRS(I)%RADFLUX(1), ZZ_GET, FED_ACTIVITY,& ! losa: new line
+                     EVAC_CORRS(I)%LIM_C_CO(1),EVAC_CORRS(I)%LIM_C_CO2(1),EVAC_CORRS(I)%LIM_C_O2(1),EVAC_CORRS(I)%LIM_C_HCN(1)) ! losa: get concentrations
              ELSE
                 ! No FED_MESH found
                 EVAC_CORRS(I)%FED_CO_CO2_O2(1) = 0.0_EB
                 EVAC_CORRS(I)%SOOT_DENS(1) = 0.0_EB
                 EVAC_CORRS(I)%TMP_G(1) = 0.0_EB
                 EVAC_CORRS(I)%RADFLUX(1) = 0.0_EB
-                !EVAC_CORRS(I)%LIM_C_CO(1) = 0.0_EB ! losa: save concentrations
-                !EVAC_CORRS(I)%LIM_C_CO2(1) = 0.0_EB ! losa: save concentrations
-                !EVAC_CORRS(I)%LIM_C_O2(1) = 0.0_EB ! losa: save concentrations
-                !EVAC_CORRS(I)%LIM_C_HCN(1)) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_CO(1) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_CO2(1) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_O2(1) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_HCN(1)) = 0.0_EB ! losa: save concentrations
              END IF                ! FED_MESH > 0, i.e. fire grid found
 
              IF ( EVAC_CORRS(I)%FED_MESH2 > 0 .AND. .NOT.DISCARD_SMOKE_INFO) THEN
@@ -7085,18 +7086,18 @@ CONTAINS
                 NOM = EVAC_CORRS(I)%FED_MESH2
                 CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                      EVAC_CORRS(I)%FED_CO_CO2_O2(2),EVAC_CORRS(I)%SOOT_DENS(2),&
-                     EVAC_CORRS(I)%TMP_G(2), EVAC_CORRS(I)%RADFLUX(2), ZZ_GET, FED_ACTIVITY)!,& ! losa: new line
-                     !EVAC_CORRS(I)%LIM_C_CO(2),EVAC_CORRS(I)%LIM_C_CO2(2),EVAC_CORRS(I)%LIM_C_O2(2),EVAC_CORRS(I)%LIM_C_HCN(2)) ! losa: get concentrations
+                     EVAC_CORRS(I)%TMP_G(2), EVAC_CORRS(I)%RADFLUX(2), ZZ_GET, FED_ACTIVITY,& ! losa: new line
+                     EVAC_CORRS(I)%LIM_C_CO(2),EVAC_CORRS(I)%LIM_C_CO2(2),EVAC_CORRS(I)%LIM_C_O2(2),EVAC_CORRS(I)%LIM_C_HCN(2)) ! losa: get concentrations
              ELSE
                 ! No FED_MESH2 found
                 EVAC_CORRS(I)%FED_CO_CO2_O2(2) = 0.0_EB
                 EVAC_CORRS(I)%SOOT_DENS(2) = 0.0_EB
                 EVAC_CORRS(I)%TMP_G(2) = 0.0_EB
                 EVAC_CORRS(I)%RADFLUX(2) = 0.0_EB
-                !EVAC_CORRS(I)%LIM_C_CO(2) = 0.0_EB ! losa: save concentrations
-                !EVAC_CORRS(I)%LIM_C_CO2(2) = 0.0_EB ! losa: save concentrations
-                !EVAC_CORRS(I)%LIM_C_O2(2) = 0.0_EB ! losa: save concentrations
-                !EVAC_CORRS(I)%LIM_C_HCN(2)) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_CO(2) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_CO2(2) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_O2(2) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_HCN(2)) = 0.0_EB ! losa: save concentrations
              END IF                ! FED_MESH2 > 0, i.e. fire grid found
 
              ! Save FED, SOOT, TEMP(C), and RADFLUX
