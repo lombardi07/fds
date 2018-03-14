@@ -5289,6 +5289,13 @@ CONTAINS
     fed_max = 0.0_EB
     ftd_max_alive = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
     ftd_max = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
+    lim_tmp = 0.0_EB ! losa: max of incapacitating quantity of living agent
+    lim_rad = 0.0_EB ! losa: max of incapacitating quantity of living agent
+    lim_co = 0.0_EB ! losa: max of incapacitating quantity of living agent
+    lim_co2 = 0.0_EB ! losa: max of incapacitating quantity of living agent
+    lim_o2 = 100.0_EB ! losa: max of incapacitating quantity of living agent
+    lim_hcn = 0.0_EB ! losa: max of incapacitating quantity of living agent
+    lim_vis = 30.0_EB ! losa: max of incapacitating quantity of living agent
     !
     APPEND_IF: IF (APPEND) THEN
        OPEN (LU_EVACCSV,file=FN_EVACCSV,form='formatted',status='old', position='append')
@@ -7252,6 +7259,13 @@ CONTAINS
        FED_MAX       = 0.0_EB
        FTD_MAX_ALIVE = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
        FTD_MAX       = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
+       lim_tmp       = 0.0_EB ! losa: max of incapacitating quantity of living agent
+       lim_rad       = 0.0_EB ! losa: max of incapacitating quantity of living agent
+       lim_co        = 0.0_EB ! losa: max of incapacitating quantity of living agent
+       lim_co2       = 0.0_EB ! losa: max of incapacitating quantity of living agent
+       lim_o2        = 100.0_EB ! losa: max of incapacitating quantity of living agent
+       lim_hcn       = 0.0_EB ! losa: max of incapacitating quantity of living agent
+       lim_vis       = 30.0_EB ! losa: max of incapacitating quantity of living agent
     END IF
 
   END SUBROUTINE PREPARE_TO_EVACUATE
