@@ -5176,6 +5176,8 @@ CONTAINS
     INTEGER(4) N_TMP
     REAL(FB) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4, T_TMP, DT_TMP
     REAL(FB) TMPOUT5, TMPOUT6, TMPOUT7, TMPOUT8
+    REAL(FB) TMPOUT9, TMPOUT10, TMPOUT11, TMPOUT12 ! losa: read/write variables for saving concentrations
+    REAL(FB) TMPOUT13, TMPOUT14, TMPOUT15, TMPOUT16 ! losa: read/write variables for saving concentrations
     CHARACTER(60), ALLOCATABLE, DIMENSION(:) :: CTEMP
     INTEGER :: size_rnd
     INTEGER, DIMENSION(8) :: t_rnd
