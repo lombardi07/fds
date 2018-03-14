@@ -7000,7 +7000,8 @@ CONTAINS
                       NOM = ABS(HUMAN_GRID(I,J)%IMESH)
                       CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                            HUMAN_GRID(I,J)%FED_CO_CO2_O2,HUMAN_GRID(I,J)%SOOT_DENS,&
-                           HUMAN_GRID(I,J)%TMP_G, HUMAN_GRID(I,J)%RADFLUX, ZZ_GET, FED_ACTIVITY)
+                           HUMAN_GRID(I,J)%TMP_G, HUMAN_GRID(I,J)%RADFLUX, ZZ_GET, FED_ACTIVITY,& ! losa: new line
+                           LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN) ! losa: get concentrations
                    END IF
                    ! Save FED, SOOT, TEMP(C), and RADFLUX
                    WRITE (LU_EVACFED) &
@@ -7044,7 +7045,8 @@ CONTAINS
                 NOM = EVAC_CORRS(I)%FED_MESH
                 CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                      EVAC_CORRS(I)%FED_CO_CO2_O2(1),EVAC_CORRS(I)%SOOT_DENS(1),&
-                     EVAC_CORRS(I)%TMP_G(1), EVAC_CORRS(I)%RADFLUX(1), ZZ_GET, FED_ACTIVITY)
+                     EVAC_CORRS(I)%TMP_G(1), EVAC_CORRS(I)%RADFLUX(1), ZZ_GET, FED_ACTIVITY,& ! losa: new line
+                     LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN) ! losa: get concentrations
              ELSE
                 ! No FED_MESH found
                 EVAC_CORRS(I)%FED_CO_CO2_O2(1) = 0.0_EB
@@ -7060,7 +7062,8 @@ CONTAINS
                 NOM = EVAC_CORRS(I)%FED_MESH2
                 CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                      EVAC_CORRS(I)%FED_CO_CO2_O2(2),EVAC_CORRS(I)%SOOT_DENS(2),&
-                     EVAC_CORRS(I)%TMP_G(2), EVAC_CORRS(I)%RADFLUX(2), ZZ_GET, FED_ACTIVITY)
+                     EVAC_CORRS(I)%TMP_G(2), EVAC_CORRS(I)%RADFLUX(2), ZZ_GET, FED_ACTIVITY,& ! losa: new line
+                     LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN) ! losa: get concentrations
              ELSE
                 ! No FED_MESH2 found
                 EVAC_CORRS(I)%FED_CO_CO2_O2(2) = 0.0_EB
@@ -15818,12 +15821,14 @@ CONTAINS
     RETURN
   END SUBROUTINE Find_walls
 
-  SUBROUTINE GET_FIRE_CONDITIONS(NOM,I,J,K,fed_indx,soot_dens,gas_temp,rad_flux, ZZ_GET, FED_ACTIVITY)
+  SUBROUTINE GET_FIRE_CONDITIONS(NOM,I,J,K,fed_indx,soot_dens,gas_temp,rad_flux, ZZ_GET, FED_ACTIVITY,& ! losa: new line
+       C_CO,C_CO2,C_O2,C_HCN) ! losa: get concentrations
     IMPLICIT NONE
     !
     ! Passed variables
     INTEGER, INTENT(IN) :: I, J, K, NOM, FED_ACTIVITY
     REAL(EB), INTENT(OUT) :: fed_indx, soot_dens, gas_temp, rad_flux
+    REAL(EB), INTENT(OUT) :: C_CO,C_CO2,C_O2,C_HCN ! losa: get concentrations
     REAL(EB), INTENT(INOUT) :: ZZ_GET(1:N_TRACKED_SPECIES)
     !
     ! Local variables
@@ -15848,11 +15853,28 @@ CONTAINS
     ! losa: get substance concentrations
     IF (CO_INDEX > 0) THEN ! losa: get concentration of CO
        Call GET_MASS_FRACTION(ZZ_GET,CO_INDEX,Y_MF_INT) ! losa: get concentration of CO
-       LIM_C_CO = SPECIES(CO_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of CO
+       C_CO = SPECIES(CO_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of CO
     ELSE ! losa: get concentration of CO
-       LIM_C_CO = 0._EB ! losa: get concentration of CO
-    ENDIF ! losa: get concentration of CO
-   
+       C_CO = 0._EB ! losa: get concentration of CO
+    ENDIF ! losa: get concentration of CO2
+    IF (CO_INDEX > 0) THEN ! losa: get concentration of CO2
+       Call GET_MASS_FRACTION(ZZ_GET,CO_INDEX,Y_MF_INT) ! losa: get concentration of CO2
+       C_CO2 = SPECIES(CO2_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of CO2
+    ELSE ! losa: get concentration of CO2
+       C_CO2 = 0._EB ! losa: get concentration of CO2
+    ENDIF ! losa: get concentration of CO2
+    IF (CO_INDEX > 0) THEN ! losa: get concentration of O2 (volume per cent)
+       Call GET_MASS_FRACTION(ZZ_GET,O2_INDEX,Y_MF_INT) ! losa: get concentration of O2 (volume per cent)
+       C_O2 = SPECIES(O2_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of O2 (volume per cent)
+    ELSE ! losa: get concentration of O2 (volume per cent)
+       C_O2 = 0._EB ! losa: get concentration of O2 (volume per cent)
+    ENDIF ! losa: get concentration of O2 (volume per cent)
+    IF (HCN_INDEX > 0) THEN ! losa: get concentration of HCN
+       Call GET_MASS_FRACTION(ZZ_GET,HCN_INDEX,Y_MF_INT) ! losa: get concentration of HCN
+       C_HCN = SPECIES(HCN_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of HCN
+    ELSE ! losa: get concentration of HCN
+       C_HCN = 0._EB ! losa: get concentration of HCN
+    ENDIF ! losa: get concentration of HCN
 
   END SUBROUTINE GET_FIRE_CONDITIONS
 
