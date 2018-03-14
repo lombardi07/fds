@@ -15840,7 +15840,7 @@ CONTAINS
        soot_dens = 0._EB
     ENDIF
     ! Calculate Purser's fractional effective dose (FED)
-    fed_indx = FED(ZZ_GET,MESHES(nom)%RSUM(I,J,K),FED_ACTIVITY)
+    fed_indx = FED(ZZ_GET,MESHES(nom)%RSUM(I,J,K),FED_ACTIVITY,LIM_C_CO)
     ! Gas temperature, ind=5, C
     gas_temp  = MESHES(nom)%TMP(I,J,K)
     ! Rad flux, ind=18, kW/m2 (no -sigma*Tamb^4 term)
