@@ -13,9 +13,6 @@
 ! cons.f90
 ! input variables are defined to let the user set the incapacitative limits:
 ! "LIM_INC_TMP,LIM_INC_RAD,LIM_INC_CO,LIM_INC_CO2,LIM_INC_O2,LIM_INC_HCN,LIM_INC_VIS"
-! concentration of substances are extracted through the "FED" function in func.f90 and 
-! stored in the following variables:
-! "LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN"
 ! variables are defined to store the maximum alive values of each quantity of interest:
 ! "LIM_TMP,LIM_RAD,LIM_CO,LIM_CO2,LIM_O2,LIM_HCN,LIM_VIS"
 ! the number of deaths caused by the limit concept is stored in the variable:
@@ -26,6 +23,9 @@
 ! quantities for all agents (later recalled with HR). without alive agents, values will
 ! fall to the following default values:
 ! "LimTmp=0._EB,LimRad=0._EB,LimCO=0._EB,LimCO2=0._EB,LimO2=100._EB,LimHCN=0._EB,LimVis=30._EB"
+! concentration of substances are extracted by the "GET_FIRE_CONDITIONS" function (defined in 
+! func.f90) called from evac.f90 and stored in the following "HUMAN_GRID" field variables:
+! "LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN"
 ! agents are not killed or stopped from moving through the concept of limits, dead agents are
 ! only flagged in the following field:
 ! "LimFallenDown"
