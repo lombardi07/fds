@@ -8202,7 +8202,7 @@ CONTAINS
                    HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
                    IF (HUMAN_GRID(II,JJ)%RADFLUX>=1700._EB) THEN ! losa: purser's fractional thermal dose (TED) concept
                       HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*(1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)),& ! losa: purser's fractional thermal dose (TED) concept
-                           HUMAN_GRID(II,JJ)%RADFLUX**(1.33_EB)/1.33_EB) ! losa: purser's fractional thermal dose (TED) concept
+                           +HUMAN_GRID(II,JJ)%RADFLUX**(1.33_EB)/1.33_EB) ! losa: purser's fractional thermal dose (TED) concept
                    ELSE ! losa: purser's fractional thermal dose (TED) concept
                       HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (TED) concept
                    ENDIF ! losa: purser's fractional thermal dose (TED) concept
@@ -8218,7 +8218,7 @@ CONTAINS
                 HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
                 IF (HUMAN_GRID(II,JJ)%RADFLUX>=1700._EB) THEN ! losa: purser's fractional thermal dose (TED) concept
                    HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*(1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)),& ! losa: purser's fractional thermal dose (TED) concept
-                        HUMAN_GRID(II,JJ)%RADFLUX**(1.33_EB)/1.33_EB) ! losa: purser's fractional thermal dose (TED) concept
+                        +HUMAN_GRID(II,JJ)%RADFLUX**(1.33_EB)/1.33_EB) ! losa: purser's fractional thermal dose (TED) concept
                 ELSE ! losa: purser's fractional thermal dose (TED) concept
                    HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (TED) concept
                 ENDIF ! losa: purser's fractional thermal dose (TED) concept
