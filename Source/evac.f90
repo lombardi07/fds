@@ -8097,7 +8097,7 @@ CONTAINS
              lim_tmp = MAX(lim_tmp,HR%LimTmp) ! losa: max of incapacitating quantity of living agent
              lim_rad = MAX(lim_rad,HR%LimRad) ! losa: max of incapacitating quantity of living agent
              lim_co = MAX(lim_co,HR%LimCO) ! losa: max of incapacitating quantity of living agent
-             lim_co2 = MAX(lim_co,HR%LimCO2) ! losa: max of incapacitating quantity of living agent
+             lim_co2 = MAX(lim_co2,HR%LimCO2) ! losa: max of incapacitating quantity of living agent
              lim_o2 = MIN(lim_o2,HR%LimO2) ! losa: max of incapacitating quantity of living agent
              lim_hcn = MAX(lim_hcn,HR%LimHCN) ! losa: max of incapacitating quantity of living agent
              lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
@@ -8922,7 +8922,7 @@ CONTAINS
              lim_tmp = MAX(lim_tmp,HR%LimTmp) ! losa: max of incapacitating quantity of living agent
              lim_rad = MAX(lim_rad,HR%LimRad) ! losa: max of incapacitating quantity of living agent
              lim_co = MAX(lim_co,HR%LimCO) ! losa: max of incapacitating quantity of living agent
-             lim_co2 = MAX(lim_co,HR%LimCO2) ! losa: max of incapacitating quantity of living agent
+             lim_co2 = MAX(lim_co2,HR%LimCO2) ! losa: max of incapacitating quantity of living agent
              lim_o2 = MIN(lim_o2,HR%LimO2) ! losa: max of incapacitating quantity of living agent
              lim_hcn = MAX(lim_hcn,HR%LimHCN) ! losa: max of incapacitating quantity of living agent
              lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
@@ -12321,7 +12321,7 @@ CONTAINS
                lim_tmp = MAX(lim_tmp,HR%LimTmp) ! losa: max of incapacitating quantity of living agent
                lim_rad = MAX(lim_rad,HR%LimRad) ! losa: max of incapacitating quantity of living agent
                lim_co = MAX(lim_co,HR%LimCO) ! losa: max of incapacitating quantity of living agent
-               lim_co2 = MAX(lim_co,HR%LimCO2) ! losa: max of incapacitating quantity of living agent
+               lim_co2 = MAX(lim_co2,HR%LimCO2) ! losa: max of incapacitating quantity of living agent
                lim_o2 = MIN(lim_o2,HR%LimO2) ! losa: max of incapacitating quantity of living agent
                lim_hcn = MAX(lim_hcn,HR%LimHCN) ! losa: max of incapacitating quantity of living agent
                lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
