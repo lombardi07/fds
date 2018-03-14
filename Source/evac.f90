@@ -15290,7 +15290,7 @@ CONTAINS
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                n_dead, fed_max, fed_max_alive, & ! losa: new line
                ted_max,ted_max_alive, & ! losa: purser's fractional thermal dose (TED) concept
-               lim_n_dead,lim_tmp,lim_rad,lim_co,lim_co2,lim_o2,lim_hcn,lim_vis ! losa: incapacitation limits
+               co_index,lim_tmp,lim_rad,lim_co,lim_co2,lim_o2,lim_hcn,lim_vis ! losa: incapacitation limits
        END IF
     ELSE
        ! Do not write the 'fed' columns
