@@ -15840,11 +15840,18 @@ CONTAINS
        soot_dens = 0._EB
     ENDIF
     ! Calculate Purser's fractional effective dose (FED)
-    fed_indx = FED(ZZ_GET,MESHES(nom)%RSUM(I,J,K),FED_ACTIVITY,LIM_C_CO)
+    fed_indx = FED(ZZ_GET,MESHES(nom)%RSUM(I,J,K),FED_ACTIVITY)
     ! Gas temperature, ind=5, C
     gas_temp  = MESHES(nom)%TMP(I,J,K)
     ! Rad flux, ind=18, kW/m2 (no -sigma*Tamb^4 term)
     rad_flux = MAX(MESHES(nom)%UII(I,J,K)/4.0_EB,SIGMA*TMPA4)
+    ! losa: get substance concentrations
+    LIM_C_CO = 0._EB ! losa: get concentration of CO
+    IF (CO_INDEX > 0) THEN ! losa: get concentration of CO
+       Call GET_MASS_FRACTION(Y_IN,CO_INDEX,Y_MF_INT) ! losa: get concentration of CO
+       LIM_C_CO = SPECIES(CO_INDEX)%RCON*Y_MF_INT*1.E6_EB/RSUM ! losa: get concentration of CO
+    ENDIF ! losa: get concentration of CO
+   
 
   END SUBROUTINE GET_FIRE_CONDITIONS
 
