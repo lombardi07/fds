@@ -6040,7 +6040,11 @@ CONTAINS
           HUMAN_GRID(i,j)%SOOT_DENS     = 0.0_EB
           HUMAN_GRID(i,j)%FED_CO_CO2_O2 = 0.0_EB
           HUMAN_GRID(i,j)%TMP_G         = 0.0_EB
-          HUMAN_GRID(i,j)%RADFLUX        = 0.0_EB
+          HUMAN_GRID(i,j)%RADFLUX       = 0.0_EB
+          HUMAN_GRID(i,j)%LIM_C_CO      = 0.0_EB ! losa: concentration at head height
+          HUMAN_GRID(i,j)%LIM_C_CO2     = 0.0_EB ! losa: concentration at head height
+          HUMAN_GRID(i,j)%LIM_C_O2      = 0.0_EB ! losa: concentration at head height
+          HUMAN_GRID(i,j)%LIM_C_HCN     = 0.0_EB ! losa: concentration at head height
           HUMAN_GRID(i,j)%IMESH         = 0
           HUMAN_GRID(i,j)%II = i
           HUMAN_GRID(i,j)%JJ = j
@@ -7008,10 +7012,15 @@ CONTAINS
                         REAL(HUMAN_GRID(I,J)%FED_CO_CO2_O2,FB), &
                         REAL(HUMAN_GRID(I,J)%SOOT_DENS,FB), &
                         REAL(HUMAN_GRID(I,J)%TMP_G,FB), &
-                        REAL(HUMAN_GRID(I,J)%RADFLUX,FB)
+                        REAL(HUMAN_GRID(I,J)%RADFLUX,FB), & ! losa: new line
+                        REAL(HUMAN_GRID(I,J)%LIM_C_CO,FB), & ! losa: save concentrations
+                        REAL(HUMAN_GRID(I,J)%LIM_C_CO2,FB), & ! losa: save concentrations
+                        REAL(HUMAN_GRID(I,J)%LIM_C_O2,FB), & ! losa: save concentrations
+                        REAL(HUMAN_GRID(I,J)%LIM_C_HCN,FB), & ! losa: save concentrations
                 ELSE ! Read FED from a file
                    ! Read FED, SOOT, TEMP(C), and RADFLUX
-                   READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4
+                   READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4,& ! losa: new line
+                        TMPOUT5, TMPOUT6, TMPOUT7, TMPOUT8 ! losa: variables to write into by read
                    IF (IOS/=0) THEN
                       WRITE(MESSAGE,'(A)') 'ERROR: EVAC_MESH_EXCHANGE: FED read error'
                       CLOSE (LU_EVACFED)
@@ -7021,6 +7030,10 @@ CONTAINS
                    HUMAN_GRID(I,J)%SOOT_DENS = TMPOUT2
                    HUMAN_GRID(I,J)%TMP_G = TMPOUT3
                    HUMAN_GRID(I,J)%RADFLUX = TMPOUT4
+                   HUMAN_GRID(I,J)%LIM_C_CO = TMPOUT5 ! losa: save concentrations
+                   HUMAN_GRID(I,J)%LIM_C_CO2 = TMPOUT6 ! losa: save concentrations
+                   HUMAN_GRID(I,J)%LIM_C_O2 = TMPOUT7 ! losa: save concentrations
+                   HUMAN_GRID(I,J)%LIM_C_HCN = TMPOUT8 ! losa: save concentrations
                 END IF   ! calculate and save FED
              END DO     ! J=1,JBAR
           END DO       ! I=1,IBAR
@@ -7028,6 +7041,10 @@ CONTAINS
           IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%TMP_G         = 0.0_EB
           IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%SOOT_DENS     = 0.0_EB
           IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%RADFLUX       = 0.0_EB
+          IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%LIM_C_CO      = 0.0_EB ! losa: don't read saved concentrations
+          IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%LIM_C_CO2     = 0.0_EB ! losa: don't read saved concentrations
+          IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%LIM_C_O2      = 0.0_EB ! losa: don't read saved concentrations
+          IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%LIM_C_HCN     = 0.0_EB ! losa: don't read saved concentrations
 
        END DO MESH_LOOP
 
@@ -7046,13 +7063,17 @@ CONTAINS
                 CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                      EVAC_CORRS(I)%FED_CO_CO2_O2(1),EVAC_CORRS(I)%SOOT_DENS(1),&
                      EVAC_CORRS(I)%TMP_G(1), EVAC_CORRS(I)%RADFLUX(1), ZZ_GET, FED_ACTIVITY,& ! losa: new line
-                     HUMAN_GRID(I,J)%LIM_C_CO,HUMAN_GRID(I,J)%LIM_C_CO2,HUMAN_GRID(I,J)%LIM_C_O2,HUMAN_GRID(I,J)%LIM_C_HCN) ! losa: get concentrations
+                     EVAC_CORRS(I)%LIM_C_CO(1),EVAC_CORRS(I)%LIM_C_CO2(1),EVAC_CORRS(I)%LIM_C_O2(1),EVAC_CORRS(I)%LIM_C_HCN(1)) ! losa: get concentrations
              ELSE
                 ! No FED_MESH found
                 EVAC_CORRS(I)%FED_CO_CO2_O2(1) = 0.0_EB
                 EVAC_CORRS(I)%SOOT_DENS(1) = 0.0_EB
                 EVAC_CORRS(I)%TMP_G(1) = 0.0_EB
                 EVAC_CORRS(I)%RADFLUX(1) = 0.0_EB
+                EVAC_CORRS(I)%LIM_C_CO(1) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_CO2(1) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_O2(1) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_HCN(1)) = 0.0_EB ! losa: save concentrations
              END IF                ! FED_MESH > 0, i.e. fire grid found
 
              IF ( EVAC_CORRS(I)%FED_MESH2 > 0 .AND. .NOT.DISCARD_SMOKE_INFO) THEN
@@ -7063,13 +7084,17 @@ CONTAINS
                 CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                      EVAC_CORRS(I)%FED_CO_CO2_O2(2),EVAC_CORRS(I)%SOOT_DENS(2),&
                      EVAC_CORRS(I)%TMP_G(2), EVAC_CORRS(I)%RADFLUX(2), ZZ_GET, FED_ACTIVITY,& ! losa: new line
-                     HUMAN_GRID(I,J)%LIM_C_CO,HUMAN_GRID(I,J)%LIM_C_CO2,HUMAN_GRID(I,J)%LIM_C_O2,HUMAN_GRID(I,J)%LIM_C_HCN) ! losa: get concentrations
+                     EVAC_CORRS(I)%LIM_C_CO(2),EVAC_CORRS(I)%LIM_C_CO2(2),EVAC_CORRS(I)%LIM_C_O2(2),EVAC_CORRS(I)%LIM_C_HCN(2)) ! losa: get concentrations
              ELSE
                 ! No FED_MESH2 found
                 EVAC_CORRS(I)%FED_CO_CO2_O2(2) = 0.0_EB
                 EVAC_CORRS(I)%SOOT_DENS(2) = 0.0_EB
                 EVAC_CORRS(I)%TMP_G(2) = 0.0_EB
                 EVAC_CORRS(I)%RADFLUX(2) = 0.0_EB
+                EVAC_CORRS(I)%LIM_C_CO(2) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_CO2(2) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_O2(2) = 0.0_EB ! losa: save concentrations
+                EVAC_CORRS(I)%LIM_C_HCN(2)) = 0.0_EB ! losa: save concentrations
              END IF                ! FED_MESH2 > 0, i.e. fire grid found
 
              ! Save FED, SOOT, TEMP(C), and RADFLUX
@@ -7081,10 +7106,19 @@ CONTAINS
                   REAL(EVAC_CORRS(I)%FED_CO_CO2_O2(2),FB), &
                   REAL(EVAC_CORRS(I)%SOOT_DENS(2),FB), &
                   REAL(EVAC_CORRS(I)%TMP_G(2),FB), &
-                  REAL(EVAC_CORRS(I)%RADFLUX(2),FB)
+                  REAL(EVAC_CORRS(I)%RADFLUX(2),FB), & ! losa: new line
+                  REAL(EVAC_CORRS(I)%LIM_C_CO(1),FB), & ! losa: save concentrations
+                  REAL(EVAC_CORRS(I)%LIM_C_CO2(1),FB), & ! losa: save concentrations
+                  REAL(EVAC_CORRS(I)%LIM_C_O2(1),FB), & ! losa: save concentrations
+                  REAL(EVAC_CORRS(I)%LIM_C_HCN(1),FB), & ! losa: save concentrations
+                  REAL(EVAC_CORRS(I)%LIM_C_CO(2),FB), & ! losa: save concentrations
+                  REAL(EVAC_CORRS(I)%LIM_C_CO2(2),FB), & ! losa: save concentrations
+                  REAL(EVAC_CORRS(I)%LIM_C_O2(2),FB), & ! losa: save concentrations
+                  REAL(EVAC_CORRS(I)%LIM_C_HCN(2),FB) ! losa: save concentrations
           ELSE                    ! Read FED from a file
              ! Read FED, SOOT, TEMP(C), and RADFLUX
-             READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4, TMPOUT5, TMPOUT6, TMPOUT7, TMPOUT8
+             READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4, TMPOUT5, TMPOUT6, TMPOUT7, TMPOUT8, & ! losa: new line
+                  TMPOUT9, TMPOUT10, TMPOUT11, TMPOUT12, TMPOUT13, TMPOUT14, TMPOUT15, TMPOUT16 ! losa: variables to write into by read
              IF (IOS/=0) THEN
                 WRITE(MESSAGE,'(A)') 'ERROR: EVAC_MESH_EXCHANGE: FED read error'
                 CLOSE (LU_EVACFED)
@@ -7093,6 +7127,8 @@ CONTAINS
              IF (DISCARD_SMOKE_INFO) THEN
                 TMPOUT1 = 0.0_EB; TMPOUT2 = 0.0_EB; TMPOUT3 = 0.0_EB; TMPOUT4 = 0.0_EB
                 TMPOUT5 = 0.0_EB; TMPOUT6 = 0.0_EB; TMPOUT7 = 0.0_EB; TMPOUT8 = 0.0_EB
+                TMPOUT9 = 0.0_EB; TMPOUT10 = 0.0_EB; TMPOUT11 = 0.0_EB; TMPOUT12 = 0.0_EB ! losa: don't read saved concentrations
+                TMPOUT13 = 0.0_EB; TMPOUT14 = 0.0_EB; TMPOUT15 = 0.0_EB; TMPOUT16 = 0.0_EB ! losa: don't read saved concentrations
              END IF
              EVAC_CORRS(I)%FED_CO_CO2_O2(1) = TMPOUT1
              EVAC_CORRS(I)%SOOT_DENS(1) = TMPOUT2
@@ -7102,6 +7138,14 @@ CONTAINS
              EVAC_CORRS(I)%SOOT_DENS(2) = TMPOUT6
              EVAC_CORRS(I)%TMP_G(2) = TMPOUT7
              EVAC_CORRS(I)%RADFLUX(2) = TMPOUT8
+             EVAC_CORRS(I)%LIM_C_CO(1) = TMPOUT9 ! losa: read saved concentrations
+             EVAC_CORRS(I)%LIM_C_CO2(1) = TMPOUT10 ! losa: read saved concentrations
+             EVAC_CORRS(I)%LIM_C_O2(1) = TMPOUT11 ! losa: read saved concentrations
+             EVAC_CORRS(I)%LIM_C_HCN(1) = TMPOUT12 ! losa: read saved concentrations
+             EVAC_CORRS(I)%LIM_C_CO(2) = TMPOUT13 ! losa: read saved concentrations
+             EVAC_CORRS(I)%LIM_C_CO2(2) = TMPOUT14 ! losa: read saved concentrations
+             EVAC_CORRS(I)%LIM_C_O2(2) = TMPOUT15 ! losa: read saved concentrations
+             EVAC_CORRS(I)%LIM_C_HCN(2) = TMPOUT16 ! losa: read saved concentrations
 
           END IF                  ! Calculate and save FED
        END DO CORR_LOOP
