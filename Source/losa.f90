@@ -13,6 +13,9 @@
 ! cons.f90
 ! input variables are defined to let the user set the incapacitative limits:
 ! "LIM_INC_TMP,LIM_INC_RAD,LIM_INC_CO,LIM_INC_CO2,LIM_INC_O2,LIM_INC_HCN,LIM_INC_VIS"
+! concentration of substances are extracted through the "FED" function in func.f90 and 
+! stored in the following variables:
+! "LIM_C_CO,LIM_C_CO2,LIM_C_O2,LIM_C_HCN"
 ! variables are defined to store the maximum alive values of each quantity of interest:
 ! "LIM_TMP,LIM_RAD,LIM_CO,LIM_CO2,LIM_O2,LIM_HCN,LIM_VIS"
 ! the number of deaths caused by the limit concept is stored in the variable:
