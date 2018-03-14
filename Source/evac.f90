@@ -8202,7 +8202,7 @@ CONTAINS
                    HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
                    IF (HUMAN_GRID(II,JJ)%RADFLUX>=1700._EB) THEN ! losa: purser's fractional thermal dose (TED) concept
                       HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*(1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB))+ & ! losa: purser's fractional thermal dose (TED) concept
-                           HUMAN_GRID(II,JJ)%RADFLUX**(1.33_EB)/1.33_EB) ! losa: purser's fractional thermal dose (TED) concept
+                           (HUMAN_GRID(II,JJ)%RADFLUX/1.0E3_EB)**(1.33_EB)/1.33_EB) ! losa: purser's fractional thermal dose (TED) concept
                    ELSE ! losa: purser's fractional thermal dose (TED) concept
                       HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (TED) concept
                    ENDIF ! losa: purser's fractional thermal dose (TED) concept
@@ -8218,7 +8218,7 @@ CONTAINS
                 HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
                 IF (HUMAN_GRID(II,JJ)%RADFLUX>=1700._EB) THEN ! losa: purser's fractional thermal dose (TED) concept
                    HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*(1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB))+ & ! losa: purser's fractional thermal dose (TED) concept
-                        HUMAN_GRID(II,JJ)%RADFLUX**(1.33_EB)/1.33_EB) ! losa: purser's fractional thermal dose (TED) concept
+                        (HUMAN_GRID(II,JJ)%RADFLUX/1.0E3_EB)**(1.33_EB)/1.33_EB) ! losa: purser's fractional thermal dose (TED) concept
                 ELSE ! losa: purser's fractional thermal dose (TED) concept
                    HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (TED) concept
                 ENDIF ! losa: purser's fractional thermal dose (TED) concept
@@ -15867,13 +15867,13 @@ CONTAINS
     ELSE ! losa: get concentration of CO
        C_CO = 0._EB ! losa: get concentration of CO
     ENDIF ! losa: get concentration of CO2
-    IF (CO_INDEX > 0) THEN ! losa: get concentration of CO2
-       Call GET_MASS_FRACTION(ZZ_GET,CO_INDEX,Y_MF_INT) ! losa: get concentration of CO2
+    IF (CO2_INDEX > 0) THEN ! losa: get concentration of CO2
+       Call GET_MASS_FRACTION(ZZ_GET,CO2_INDEX,Y_MF_INT) ! losa: get concentration of CO2
        C_CO2 = SPECIES(CO2_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of CO2
     ELSE ! losa: get concentration of CO2
        C_CO2 = 0._EB ! losa: get concentration of CO2
     ENDIF ! losa: get concentration of CO2
-    IF (CO_INDEX > 0) THEN ! losa: get concentration of O2 (volume per cent)
+    IF (O2_INDEX > 0) THEN ! losa: get concentration of O2 (volume per cent)
        Call GET_MASS_FRACTION(ZZ_GET,O2_INDEX,Y_MF_INT) ! losa: get concentration of O2 (volume per cent)
        C_O2 = SPECIES(O2_INDEX)%RCON*Y_MF_INT*1.E6_EB/MESHES(nom)%RSUM(I,J,K) ! losa: get concentration of O2 (volume per cent)
     ELSE ! losa: get concentration of O2 (volume per cent)
