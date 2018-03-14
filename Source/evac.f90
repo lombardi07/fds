@@ -411,7 +411,7 @@ MODULE EVAC
   !
   INTEGER :: n_dead=0, icyc_old=0, n_change_doors=0, n_change_trials=0
   REAL(EB) :: fed_max_alive, fed_max
-  REAL(EB) :: ftd_max_alive, ftd_max ! losa: purser's fractional thermal dose (FTD) concept
+  REAL(EB) :: ted_max_alive, ted_max ! losa: purser's fractional thermal dose (TED) concept
   INTEGER, DIMENSION(:,:), ALLOCATABLE :: N_HawkDoveCount
   !
   ! Stairs constants
@@ -5287,8 +5287,8 @@ CONTAINS
     lim_n_dead=-1 ! losa: incapacitation limits, death counter
     fed_max_alive = 0.0_EB
     fed_max = 0.0_EB
-    ftd_max_alive = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
-    ftd_max = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
+    ted_max_alive = 0.0_EB ! losa: purser's fractional thermal dose (TED) concept
+    ted_max = 0.0_EB ! losa: purser's fractional thermal dose (TED) concept
     lim_tmp = 0.0_EB ! losa: max of incapacitating quantity of living agent
     lim_rad = 0.0_EB ! losa: max of incapacitating quantity of living agent
     lim_co = 0.0_EB ! losa: max of incapacitating quantity of living agent
@@ -5768,7 +5768,7 @@ CONTAINS
                ('TargetDoorCounter', i=1,N_DOORS), &
                ('DensityCounter', i=1,j_density-j_ntargets), &
                'Agents','FED_Index','FED_Index', & ! losa: new line
-               'FTD_Index','FTD_Index', & ! losa: purser's fractional thermal dose (FTD) concept
+               'TED_Index','TED_Index', & ! losa: purser's fractional thermal dose (TED) concept
                'Agents','°C','kW/m2','ppm','ppm','%','ppm','m' ! losa: incapacitation limits
           WRITE (LU_EVACCSV,tcform) 'EVAC_Time','AllAgents', &
                (TRIM(EVAC_Node_List(i)%GRID_NAME), i=1,n_egrids), &
@@ -5779,7 +5779,7 @@ CONTAINS
                (TRIM(EVAC_DOORS(i)%ID), i=1,N_DOORS), &
                (TRIM(CTEMP(i)), i=j_ntargets+1,j_density), &
                'Number_of_Deads','FED_max','FED_max_alive', & ! losa: new line
-               'FTD_max','FTD_max_alive', & ! losa: purser's fractional thermal dose (FTD) concept
+               'TED_max','TED_max_alive', & ! losa: purser's fractional thermal dose (TED) concept
                'LIM_dead','TMP_max_alive','RAD_max_alive','CO_max_alive','CO2_max_alive','O2_min_alive', &
                'HCN_max_alive','VIS_min_alive' ! losa: incapacitation limits
        ELSE
@@ -6547,7 +6547,7 @@ CONTAINS
              HR%SumForces = 0.0_EB
              HR%SumForces2 = 0.0_EB
              HR%IntDose   = 0.0_EB
-             HR%TmpDose   = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
+             HR%TmpDose   = 0.0_EB ! losa: purser's fractional thermal dose (TED) concept
              HR%Eta       = 0.0_EB
              HR%Ksi       = 0.0_EB
              HR%NewRnd    = .TRUE.
@@ -7257,8 +7257,8 @@ CONTAINS
        ICYC_OLD = ICYC
        FED_MAX_ALIVE = 0.0_EB
        FED_MAX       = 0.0_EB
-       FTD_MAX_ALIVE = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
-       FTD_MAX       = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
+       TED_MAX_ALIVE = 0.0_EB ! losa: purser's fractional thermal dose (TED) concept
+       TED_MAX       = 0.0_EB ! losa: purser's fractional thermal dose (TED) concept
        lim_tmp       = 0.0_EB ! losa: max of incapacitating quantity of living agent
        lim_rad       = 0.0_EB ! losa: max of incapacitating quantity of living agent
        lim_co        = 0.0_EB ! losa: max of incapacitating quantity of living agent
@@ -8100,7 +8100,7 @@ CONTAINS
           END IF ! losa: end if, incapacitation limits
           ! losa: todo: missing conditions for HR%LimCO>=LIM_INC_CO,HR%LimCO2>=LIM_INC_CO2,HR%LimO2>=LIM_INC_O2,HR%LimHCN>=LIM_INC_HCN
           L_DEAD = .FALSE.
-          IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (FTD) concept
+          IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (TED) concept
              L_DEAD = .TRUE.
              ! No random force for a dead person.
              GATH = 0.0_EB
@@ -8121,11 +8121,11 @@ CONTAINS
              HR%COLOR_INDEX = EVAC_AVATAR_NCOLOR
           ELSE
              FED_MAX_ALIVE = MAX(FED_MAX_ALIVE,HR%INTDOSE)
-             FTD_MAX_ALIVE = MAX(FTD_MAX_ALIVE,HR%TMPDOSE) ! losa: purser's fractional thermal dose (FTD) concept
+             TED_MAX_ALIVE = MAX(TED_MAX_ALIVE,HR%TMPDOSE) ! losa: purser's fractional thermal dose (TED) concept
           END IF
           IF (L_FALLEN_DOWN) HR%COLOR_INDEX = EVAC_AVATAR_NCOLOR
           FED_MAX = MAX(FED_MAX,HR%INTDOSE)  ! Dead or alive
-          FTD_MAX = MAX(FTD_MAX,HR%TMPDOSE) ! losa: purser's fractional thermal dose (FTD) concept
+          TED_MAX = MAX(TED_MAX,HR%TMPDOSE) ! losa: purser's fractional thermal dose (TED) concept
           HR_TAU      = HR%TAU
           HR_TAU_INER = HR%TAU_INER
           ! MAX(0,HR%GROUP_ID)  Group index
@@ -8197,7 +8197,7 @@ CONTAINS
              IF (HR%IEL > 0) THEN  ! From an evac line
                 IF (T >= EVAC_EVACS(HR%IEL)%T_START_FED) THEN
                    HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
-                   HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (FTD) concept
+                   HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (TED) concept
                    HR%LimTmp = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
                    HR%LimRad = HUMAN_GRID(II,JJ)%RADFLUX ! losa: incapacitating quantity
                    HR%LimCO = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
@@ -8208,7 +8208,7 @@ CONTAINS
                 END IF
              ELSE ! From an entr line
                 HR%INTDOSE = DTSP*HUMAN_GRID(II,JJ)%FED_CO_CO2_O2 + HR%INTDOSE
-           	HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (FTD) concept
+           	HR%TMPDOSE = HR%TMPDOSE + DTSP/60_EB*1.0_EB/EXP(5.1849_EB-0.0273_EB*(HUMAN_GRID(II,JJ)%TMP_G-273.15_EB)) ! losa: purser's fractional thermal dose (TED) concept
                 HR%LimTmp = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
                 HR%LimRad = HUMAN_GRID(II,JJ)%RADFLUX ! losa: incapacitating quantity
                 HR%LimCO = HUMAN_GRID(II,JJ)%TMP_G-273.15_EB ! losa: incapacitating quantity
@@ -8915,7 +8915,7 @@ CONTAINS
           END IF ! losa: end if, incapacitation limits
           ! losa: todo: missing conditions for HR%LimCO>=LIM_INC_CO,HR%LimCO2>=LIM_INC_CO2,HR%LimO2>=LIM_INC_O2,HR%LimHCN>=LIM_INC_HCN
           L_DEAD  = .FALSE.
-          IF (HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB) THEN ! losa: purser's fractional thermal dose (FTD) concept
+          IF (HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB) THEN ! losa: purser's fractional thermal dose (TED) concept
              L_DEAD = .TRUE.
              ! No random force for a dead person.
              GATH = 0.0_EB
@@ -12313,7 +12313,7 @@ CONTAINS
                lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
             END IF ! losa: end if, incapacitation limits
             ! losa: todo: missing conditions for HR%LimCO>=LIM_INC_CO,HR%LimCO2>=LIM_INC_CO2,HR%LimO2>=LIM_INC_O2,HR%LimHCN>=LIM_INC_HCN
-            IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (FTD) concept
+            IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (TED) concept
                IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                   N_DEAD = N_DEAD+1
                   HR%TPRE = HUGE(HR%TPRE)
@@ -12323,10 +12323,10 @@ CONTAINS
                END IF
             ELSE
                FED_MAX_ALIVE = MAX(FED_MAX_ALIVE,HR%INTDOSE)
-               FTD_MAX_ALIVE = MAX(FTD_MAX_ALIVE,HR%TMPDOSE) ! losa: purser's fractional thermal dose (FTD) concept
+               TED_MAX_ALIVE = MAX(TED_MAX_ALIVE,HR%TMPDOSE) ! losa: purser's fractional thermal dose (TED) concept
             END IF
             FED_MAX = MAX(FED_MAX,HR%INTDOSE)
-            FTD_MAX = MAX(FTD_MAX,HR%TMPDOSE) ! losa: purser's fractional thermal dose (FTD) concept
+            TED_MAX = MAX(TED_MAX,HR%TMPDOSE) ! losa: purser's fractional thermal dose (TED) concept
 
             ! calculate Purser's fractional effective dose (FED)
             IF (T > T_BEGIN) THEN
@@ -13209,7 +13209,7 @@ CONTAINS
          HR%SumForces = 0.0_EB
          HR%SumForces2 = 0.0_EB
          HR%IntDose   = 0.0_EB
-         HR%TmpDose   = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
+         HR%TmpDose   = 0.0_EB ! losa: purser's fractional thermal dose (TED) concept
          HR%Eta       = 0.0_EB
          HR%Ksi       = 0.0_EB
          HR%NewRnd    = .TRUE.
@@ -13686,7 +13686,7 @@ CONTAINS
             HR%SumForces  = 0.0_EB
             HR%SumForces2 = 0.0_EB
             HR%IntDose    = 0.0_EB
-            HR%TmpDose    = 0.0_EB ! losa: purser's fractional thermal dose (FTD) concept
+            HR%TmpDose    = 0.0_EB ! losa: purser's fractional thermal dose (TED) concept
             HR%Eta        = 0.0_EB
             HR%Ksi        = 0.0_EB
             HR%NewRnd     = .TRUE.
@@ -15264,7 +15264,7 @@ CONTAINS
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                (ITEMP(i), i = ii_ntargets+1,ii_density), &
                n_dead, fed_max, fed_max_alive, & ! losa: new line
-               ftd_max,ftd_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
+               ted_max,ted_max_alive, & ! losa: purser's fractional thermal dose (TED) concept
                lim_n_dead,lim_tmp,lim_rad,lim_co,lim_co2,lim_o2,lim_hcn,lim_vis ! losa: incapacitation limits
        ELSE
           WRITE(tcform,'(a,i4.4,a,a)') "(ES13.5E3,",n_cols+1, &
@@ -15276,7 +15276,7 @@ CONTAINS
                (EVAC_DOORS(i)%ICOUNT, i = 1,N_DOORS), &
                (NINT(ITEMP(i)), i = 1,N_EXITS-n_co_exits+N_DOORS), &
                n_dead, fed_max, fed_max_alive, & ! losa: new line
-               ftd_max,ftd_max_alive, & ! losa: purser's fractional thermal dose (FTD) concept
+               ted_max,ted_max_alive, & ! losa: purser's fractional thermal dose (TED) concept
                lim_n_dead,lim_tmp,lim_rad,lim_co,lim_co2,lim_o2,lim_hcn,lim_vis ! losa: incapacitation limits
        END IF
     ELSE
