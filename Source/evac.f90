@@ -15846,10 +15846,11 @@ CONTAINS
     ! Rad flux, ind=18, kW/m2 (no -sigma*Tamb^4 term)
     rad_flux = MAX(MESHES(nom)%UII(I,J,K)/4.0_EB,SIGMA*TMPA4)
     ! losa: get substance concentrations
-    LIM_C_CO = 0._EB ! losa: get concentration of CO
     IF (CO_INDEX > 0) THEN ! losa: get concentration of CO
-       Call GET_MASS_FRACTION(Y_IN,CO_INDEX,Y_MF_INT) ! losa: get concentration of CO
+       Call GET_MASS_FRACTION(ZZ_GET,CO_INDEX,Y_MF_INT) ! losa: get concentration of CO
        LIM_C_CO = SPECIES(CO_INDEX)%RCON*Y_MF_INT*1.E6_EB/RSUM ! losa: get concentration of CO
+    ELSE ! losa: get concentration of CO
+       LIM_C_CO = 0._EB ! losa: get concentration of CO
     ENDIF ! losa: get concentration of CO
    
 
