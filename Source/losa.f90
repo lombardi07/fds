@@ -41,5 +41,7 @@
 ! the word "TED". as with the narcotic dose "FED" a value >=1 will kill the agent and stop him
 ! from exerting any forces with the surrounding. the two quantities, FED and TED, are not
 ! cumulable.
-!
+! in the concept of limits the first incapacitating quantity that reaches its limit flags the
+! corresponding agent as dead. this concept is implemented without altering the behaviour of
+! agents in EVAC.
 ! outputs are written in the *evac.csv file.
