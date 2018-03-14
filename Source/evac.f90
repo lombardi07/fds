@@ -7018,7 +7018,7 @@ CONTAINS
                         REAL(HUMAN_GRID(I,J)%LIM_C_CO,FB), & ! losa: save concentrations
                         REAL(HUMAN_GRID(I,J)%LIM_C_CO2,FB), & ! losa: save concentrations
                         REAL(HUMAN_GRID(I,J)%LIM_C_O2,FB), & ! losa: save concentrations
-                        REAL(HUMAN_GRID(I,J)%LIM_C_HCN,FB), & ! losa: save concentrations
+                        REAL(HUMAN_GRID(I,J)%LIM_C_HCN,FB) ! losa: save concentrations
                 ELSE ! Read FED from a file
                    ! Read FED, SOOT, TEMP(C), and RADFLUX
                    READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4,& ! losa: new line
@@ -7064,7 +7064,7 @@ CONTAINS
                 NOM = EVAC_CORRS(I)%FED_MESH
                 CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                      EVAC_CORRS(I)%FED_CO_CO2_O2(1),EVAC_CORRS(I)%SOOT_DENS(1),&
-                     EVAC_CORRS(I)%TMP_G(1), EVAC_CORRS(I)%RADFLUX(1), ZZ_GET, FED_ACTIVITY!,& ! losa: new line
+                     EVAC_CORRS(I)%TMP_G(1), EVAC_CORRS(I)%RADFLUX(1), ZZ_GET, FED_ACTIVITY)!,& ! losa: new line
                      !EVAC_CORRS(I)%LIM_C_CO(1),EVAC_CORRS(I)%LIM_C_CO2(1),EVAC_CORRS(I)%LIM_C_O2(1),EVAC_CORRS(I)%LIM_C_HCN(1)) ! losa: get concentrations
              ELSE
                 ! No FED_MESH found
@@ -7085,7 +7085,7 @@ CONTAINS
                 NOM = EVAC_CORRS(I)%FED_MESH2
                 CALL GET_FIRE_CONDITIONS(NOM,I1,J1,K1,&
                      EVAC_CORRS(I)%FED_CO_CO2_O2(2),EVAC_CORRS(I)%SOOT_DENS(2),&
-                     EVAC_CORRS(I)%TMP_G(2), EVAC_CORRS(I)%RADFLUX(2), ZZ_GET, FED_ACTIVITY!,& ! losa: new line
+                     EVAC_CORRS(I)%TMP_G(2), EVAC_CORRS(I)%RADFLUX(2), ZZ_GET, FED_ACTIVITY)!,& ! losa: new line
                      !EVAC_CORRS(I)%LIM_C_CO(2),EVAC_CORRS(I)%LIM_C_CO2(2),EVAC_CORRS(I)%LIM_C_O2(2),EVAC_CORRS(I)%LIM_C_HCN(2)) ! losa: get concentrations
              ELSE
                 ! No FED_MESH2 found
