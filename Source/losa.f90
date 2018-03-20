@@ -50,6 +50,3 @@
 ! the fire calculation through the function "GET_FIRE_CONDITIONS". data of the "HUMAN_GRID" is
 ! saved on the disk, while concentrations from "EVAC_CORRS" are dumped.
 ! outputs are written in the *evac.csv file.
-
-
-! im adding a new line here to test
