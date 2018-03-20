@@ -283,7 +283,7 @@ LOGICAL, SAVE :: CC_MATVEC_DEFINED=.FALSE.
 
 LOGICAL, PARAMETER :: TRAP_CORR=.TRUE.  ! Solve implicit corrector step with Trapezoidal Rule? If not implicit RK2 corr.
                                         ! Which boils down to Backward Euler.
-REAL(EB),PARAMETER :: BRP1 = 0._EB ! If 0., Godunov for advective term; if 1., centered interp.
+REAL(EB), SAVE :: BRP1 = 0._EB ! If 0., Godunov for advective term; if 1., centered interp.
 
 INTEGER, ALLOCATABLE, DIMENSION(:) :: NUNKZ_LOC, NUNKZ_TOT, UNKZ_IND, UNKZ_ILC
 INTEGER :: NUNKZ_LOCAL,NUNKZ_TOTAL
@@ -1760,7 +1760,7 @@ INTEGER :: ICF
 CHARACTER(80) :: FN_CCTIME
 CHARACTER(200)::TCFORM
 
-IF (N_GEOMETRY==0 .AND. .NOT.(PERIODIC_TEST==103 .OR. PERIODIC_TEST==11)) THEN
+IF (N_GEOMETRY==0 .AND. .NOT.(PERIODIC_TEST==103 .OR. PERIODIC_TEST==11 .OR. PERIODIC_TEST==7)) THEN
    IF (MYID==0) THEN
       WRITE(LU_ERR,*) ' '
       WRITE(LU_ERR,*) 'CCIBM Setup Error : &MISC CC_IBM=.TRUE., but no &GEOM namelist defined on input file.'
@@ -1783,7 +1783,7 @@ IF (TRN_ME(2) > 0) THEN ! There is a TRNX, TRNY or TRNZ line defined for stretch
    RETURN
 ENDIF
 
-
+! Defined relative GEOMEPS:
 MAX_DIST=0._EB
 ! Loop Meshes:
 DO NM=LOWER_MESH_INDEX,UPPER_MESH_INDEX
@@ -1800,7 +1800,15 @@ IF (N_MPI_PROCESSES > 1) THEN
 ENDIF
 
 ! Set relative epsilon for cut-cell definition:
+MAX_DIST= MAX(1._EB,MAX_DIST)
 GEOMEPS = GEOMEPS*MAX_DIST
+
+! Set Flux limiter for cut-cell region:
+IF(FLUX_LIMITER==CENTRAL_LIMITER) THEN
+   BRP1 = 1._EB ! If 0., Godunov for advective term; if 1., centered interp.
+ELSE ! For any other flux limiter use Godunov in CC region.
+   BRP1 = 0._EB ! If 0., Godunov for advective term; if 1., centered interp.
+ENDIF
 
 IF (PERIODIC_TEST == 105) THEN ! Set cc-guard to zero, for timings.
    NGUARD = 2
@@ -2406,6 +2414,7 @@ USE MATH_FUNCTIONS, ONLY: INTERPOLATE1D_UNIFORM
 USE PHYSICAL_FUNCTIONS, ONLY: GET_CONDUCTIVITY,GET_SPECIFIC_HEAT,GET_SENSIBLE_ENTHALPY_Z, &
                               GET_SENSIBLE_ENTHALPY,GET_VISCOSITY,GET_MOLECULAR_WEIGHT
 USE COMP_FUNCTIONS, ONLY: CURRENT_TIME
+USE MANUFACTURED_SOLUTIONS, ONLY: UF_MMS,WF_MMS,VD2D_MMS_Z_SRC
 
 REAL(EB), INTENT(IN) :: T,DT
 INTEGER,  INTENT(IN) :: NM
@@ -2444,6 +2453,9 @@ TYPE(WALL_TYPE), POINTER :: WC=>NULL()
 TYPE(CFACE_TYPE), POINTER :: CFA=>NULL()
 INTEGER :: IW,IPZ, IND1,IND2
 REAL(EB) :: VC, VC1
+
+! Shunn MMS test case vars:
+REAL(EB) :: XHAT, ZHAT, Q_Z, TT
 
 ! Dummy on T:
 DUMMY = T
@@ -2757,7 +2769,6 @@ IF (STRATIFICATION) THEN
    ENDDO
 
    IF (PREDICTOR) THEN
-
       DO ICC=1,MESHES(NM)%N_CUTCELL_MESH
          DO JCC=1,CUT_CELL(ICC)%NCELL
             ! D = D + w*rho_0*g/(rho*Cp*T)*Vii
@@ -2766,9 +2777,7 @@ IF (STRATIFICATION) THEN
             CUT_CELL(ICC)%RHO_0(JCC)*GVEC(KAXIS)*CUT_CELL(ICC)%VOLUME(JCC)
          ENDDO
       ENDDO
-
    ELSE ! CORRECTOR
-
       DO ICC=1,MESHES(NM)%N_CUTCELL_MESH
          DO JCC=1,CUT_CELL(ICC)%NCELL
             ! D = D + w*rho_0*g/(rho*Cp*T)*Vii
@@ -2777,12 +2786,77 @@ IF (STRATIFICATION) THEN
             CUT_CELL(ICC)%RHO_0(JCC)*GVEC(KAXIS)*CUT_CELL(ICC)%VOLUME(JCC)
          ENDDO
       ENDDO
-
    ENDIF
-
 ENDIF
 
+! Manufactured solution
 
+MMS_IF: IF (PERIODIC_TEST==7) THEN
+   IF (PREDICTOR) TT=T+DT
+   IF (CORRECTOR) TT=T
+   ! Regular cells on cut-cell region:
+   DO K=1,KBAR
+      DO J=1,JBAR
+         DO I=1,IBAR
+            IF (CCVAR(I,J,K,IBM_UNKZ) <= 0) CYCLE
+            ! this term is similar to D_REACTION from fire
+            XHAT = XC(I) - UF_MMS*TT
+            ZHAT = ZC(K) - WF_MMS*TT
+            DO N=1,N_TRACKED_SPECIES
+               SM => SPECIES_MIXTURE(N)
+               SELECT CASE(N)
+                  CASE(1); Q_Z = -VD2D_MMS_Z_SRC(XHAT,ZHAT,TT)
+                  CASE(2); Q_Z =  VD2D_MMS_Z_SRC(XHAT,ZHAT,TT)
+               END SELECT
+               CALL GET_SENSIBLE_ENTHALPY_Z(N,TMP(I,J,K),H_S)
+               DP(I,J,K) = DP(I,J,K) + ( SM%RCON/RSUM(I,J,K) - H_S*R_H_G(I,J,K) )*Q_Z/RHOP(I,J,K)*DX(I)*DY(J)*DZ(K)
+            ENDDO
+         ENDDO
+      ENDDO
+   ENDDO
+   ! Cut-cells:
+   IF (PREDICTOR) THEN
+      DO ICC=1,MESHES(NM)%N_CUTCELL_MESH
+         DO JCC=1,CUT_CELL(ICC)%NCELL
+            ! this term is similar to D_REACTION from fire
+            XHAT = CUT_CELL(ICC)%XYZCEN(IAXIS,JCC) - UF_MMS*TT
+            ZHAT = CUT_CELL(ICC)%XYZCEN(KAXIS,JCC) - WF_MMS*TT
+            TMPV(0) = CUT_CELL(ICC)%TMP(JCC)
+            DO N=1,N_TRACKED_SPECIES
+               SM => SPECIES_MIXTURE(N)
+               SELECT CASE(N)
+                  CASE(1); Q_Z = -VD2D_MMS_Z_SRC(XHAT,ZHAT,TT)
+                  CASE(2); Q_Z =  VD2D_MMS_Z_SRC(XHAT,ZHAT,TT)
+               END SELECT
+               CALL GET_SENSIBLE_ENTHALPY_Z(N,TMPV(0),H_S)
+               CUT_CELL(ICC)%DS(JCC) = CUT_CELL(ICC)%DS(JCC) +  &
+               (SM%RCON/CUT_CELL(ICC)%RSUM(JCC) - H_S*CUT_CELL(ICC)%R_H_G(JCC)) * &
+               Q_Z/CUT_CELL(ICC)%RHOS(JCC)*CUT_CELL(ICC)%VOLUME(JCC)
+            ENDDO
+         ENDDO
+      ENDDO
+   ELSE ! CORRECTOR
+      DO ICC=1,MESHES(NM)%N_CUTCELL_MESH
+         DO JCC=1,CUT_CELL(ICC)%NCELL
+            ! this term is similar to D_REACTION from fire
+            XHAT = CUT_CELL(ICC)%XYZCEN(IAXIS,JCC) - UF_MMS*TT
+            ZHAT = CUT_CELL(ICC)%XYZCEN(KAXIS,JCC) - WF_MMS*TT
+            TMPV(0) = CUT_CELL(ICC)%TMP(JCC)
+            DO N=1,N_TRACKED_SPECIES
+               SM => SPECIES_MIXTURE(N)
+               SELECT CASE(N)
+                  CASE(1); Q_Z = -VD2D_MMS_Z_SRC(XHAT,ZHAT,TT)
+                  CASE(2); Q_Z =  VD2D_MMS_Z_SRC(XHAT,ZHAT,TT)
+               END SELECT
+               CALL GET_SENSIBLE_ENTHALPY_Z(N,TMPV(0),H_S)
+               CUT_CELL(ICC)%D(JCC) = CUT_CELL(ICC)%D(JCC) +  &
+               (SM%RCON/CUT_CELL(ICC)%RSUM(JCC) - H_S*CUT_CELL(ICC)%R_H_G(JCC)) * &
+               Q_Z/CUT_CELL(ICC)%RHO(JCC)*CUT_CELL(ICC)%VOLUME(JCC)
+            ENDDO
+         ENDDO
+      ENDDO
+   ENDIF
+ENDIF MMS_IF
 
 
 ! Assign divergence on Cartesian Cells:
@@ -5706,6 +5780,7 @@ END SUBROUTINE CCREGION_DIVERGENCE_PART_1
 
 SUBROUTINE CCREGION_DIFFUSIVE_MASS_FLUXES(NM)
 USE MATH_FUNCTIONS, ONLY: INTERPOLATE1D_UNIFORM
+USE MANUFACTURED_SOLUTIONS, ONLY: DIFF_MMS
 INTEGER, INTENT(IN) :: NM
 
 ! NOTE: this routine assumes POINT_TO_MESH(NM) has been previously called.
@@ -5765,10 +5840,17 @@ DIFFUSIVE_FLUX_LOOP: DO N=1,N_TOTAL_SCALARS
 
       ! Diffusive Part:
       IF (DNS) THEN
-         ! Interpolate D_Z to the face:
-         DO ISIDE=-1,0
-            CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I+FCELL+ISIDE,J,K),D_Z_TEMP(ISIDE))
-         ENDDO
+         IF(PERIODIC_TEST==7) THEN
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               D_Z_TEMP(ISIDE) = DIFF_MMS / RHOP(I+FCELL+ISIDE,J,K)
+            ENDDO
+         ELSE
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I+FCELL+ISIDE,J,K),D_Z_TEMP(ISIDE))
+            ENDDO
+         ENDIF
       ELSE ! LES
          DO ISIDE=-1,0
             D_Z_TEMP(ISIDE)= MU(I+FCELL+ISIDE,J,K)*RSC/RHOP(I+FCELL+ISIDE,J,K)
@@ -5828,10 +5910,17 @@ DIFFUSIVE_FLUX_LOOP: DO N=1,N_TOTAL_SCALARS
 
       ! Diffusive Part:
       IF (DNS) THEN
-         ! Interpolate D_Z to the face:
-         DO ISIDE=-1,0
-            CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I,J+FCELL+ISIDE,K),D_Z_TEMP(ISIDE))
-         ENDDO
+         IF(PERIODIC_TEST==7) THEN
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               D_Z_TEMP(ISIDE) = DIFF_MMS / RHOP(I,J+FCELL+ISIDE,K)
+            ENDDO
+         ELSE
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I,J+FCELL+ISIDE,K),D_Z_TEMP(ISIDE))
+            ENDDO
+         ENDIF
       ELSE ! LES
          DO ISIDE=-1,0
             D_Z_TEMP(ISIDE)= MU(I,J+FCELL+ISIDE,K)*RSC/RHOP(I,J+FCELL+ISIDE,K)
@@ -5891,10 +5980,17 @@ DIFFUSIVE_FLUX_LOOP: DO N=1,N_TOTAL_SCALARS
 
       ! Diffusive Part:
       IF (DNS) THEN
-         ! Interpolate D_Z to the face:
-         DO ISIDE=-1,0
-            CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I,J,K+FCELL+ISIDE),D_Z_TEMP(ISIDE))
-         ENDDO
+         IF(PERIODIC_TEST==7) THEN
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               D_Z_TEMP(ISIDE) = DIFF_MMS / RHOP(I,J,K+FCELL+ISIDE)
+            ENDDO
+         ELSE
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I,J,K+FCELL+ISIDE),D_Z_TEMP(ISIDE))
+            ENDDO
+         ENDIF
       ELSE ! LES
          DO ISIDE=-1,0
             D_Z_TEMP(ISIDE)= MU(I,J,K+FCELL+ISIDE)*RSC/RHOP(I,J,K+FCELL+ISIDE)
@@ -6060,9 +6156,16 @@ DIFFUSIVE_FLUX_LOOP: DO N=1,N_TOTAL_SCALARS
 
       ! Interpolate D_Z to the face, linear interpolation:
       IF (DNS) THEN
-         DO ISIDE=-1,0
-            CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMPV(ISIDE),D_Z_TEMP(ISIDE))
-         ENDDO
+         IF(PERIODIC_TEST==7) THEN
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               D_Z_TEMP(ISIDE) = DIFF_MMS / RHOPV(ISIDE)
+            ENDDO
+         ELSE
+            DO ISIDE=-1,0
+               CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMPV(ISIDE),D_Z_TEMP(ISIDE))
+            ENDDO
+         ENDIF
       ENDIF
 
       ! One Term defined flux:
@@ -6144,7 +6247,11 @@ DIFFUSIVE_FLUX_LOOP: DO N=1,N_TOTAL_SCALARS
                TMPV(ISIDE) = -1._EB
             END SELECT
             IF (DNS) THEN
-               CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMPV(ISIDE),D_Z_TEMP(ISIDE))
+               IF(PERIODIC_TEST==7) THEN
+                  D_Z_TEMP(ISIDE) = DIFF_MMS / RHOPV(ISIDE)
+               ELSE
+                  CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMPV(ISIDE),D_Z_TEMP(ISIDE))
+               ENDIF
             ELSE
                D_Z_TEMP(ISIDE) = MUV(ISIDE)*RSC/RHOPV(ISIDE)
             ENDIF
@@ -6752,6 +6859,8 @@ SPECIES_LOOP: DO N=1,N_TOTAL_SCALARS
          CALL GET_M_DOT_PPP_SCALAR_3D(N)
       ENDIF
 
+      IF (PERIODIC_TEST==7) CALL GET_SHUNN3_QZ(T,N)
+
       ! Flux vector F_EXIM in the EXIM boundary for species N:
       CALL GET_EXIMVECTOR_SCALAR_3D(N)
 
@@ -6800,6 +6909,57 @@ CALL GET_RHOZZ_CCIMPREG_3D
 RETURN
 END SUBROUTINE CCREGION_DENSITY_EXPLICIT
 
+! --------------------------------- GET_SHUNN3_QZ --------------------------------
+
+SUBROUTINE GET_SHUNN3_QZ(T,N)
+
+USE MANUFACTURED_SOLUTIONS, ONLY: UF_MMS,WF_MMS,VD2D_MMS_Z_SRC
+
+REAL(EB),INTENT(IN) :: T
+INTEGER, INTENT(IN) :: N
+
+! Local Variables:
+INTEGER I,J,K,NM,IROW,ICC,JCC
+REAL(EB) :: FCT,XHAT,ZHAT,Q_Z
+
+FCT=REAL(2*(1-N)+1,EB)
+
+! Mesh Loop:
+MESH_LOOP : DO NM=LOWER_MESH_INDEX,UPPER_MESH_INDEX
+
+   CALL POINT_TO_MESH(NM)
+
+   ! First add Q_Z on regular cells to source F_Z:
+   DO K=1,KBAR
+      DO J=1,JBAR
+         DO I=1,IBAR
+            IF(CCVAR(I,J,K,IBM_UNKZ) <= 0) CYCLE
+            IROW = CCVAR(I,J,K,IBM_UNKZ) - UNKZ_IND(NM_START) ! All row indexes must refer to ind_loc.
+            ! divergence from EOS
+            XHAT = XC(I) - UF_MMS*T
+            ZHAT = ZC(K) - WF_MMS*T
+            Q_Z = VD2D_MMS_Z_SRC(XHAT,ZHAT,T)
+            F_Z(IROW) = F_Z(IROW) + FCT*Q_Z*DX(I)*DY(J)*DZ(K)
+         ENDDO
+      ENDDO
+   ENDDO
+
+   ! Then add Cut-cell contributions to F_Z:
+   DO ICC=1,MESHES(NM)%N_CUTCELL_MESH
+      DO JCC=1,CUT_CELL(ICC)%NCELL
+         IROW = CUT_CELL(ICC)%UNKZ(JCC) - UNKZ_IND(NM_START) ! All row indexes must refer to ind_loc.
+         ! divergence from EOS
+         XHAT = CUT_CELL(ICC)%XYZCEN(IAXIS,JCC) - UF_MMS*T
+         ZHAT = CUT_CELL(ICC)%XYZCEN(KAXIS,JCC) - WF_MMS*T
+         Q_Z = VD2D_MMS_Z_SRC(XHAT,ZHAT,T)
+         F_Z(IROW) = F_Z(IROW) + FCT*Q_Z*CUT_CELL(ICC)%VOLUME(JCC)
+      ENDDO
+   ENDDO
+
+ENDDO MESH_LOOP
+
+RETURN
+END SUBROUTINE GET_SHUNN3_QZ
 
 ! ---------------------------- GET_M_DOT_PPP_SCALAR_3D ---------------------------
 
@@ -6811,9 +6971,7 @@ INTEGER, INTENT(IN) :: N
 INTEGER :: NM,I,J,K,IROW,ICC,JCC,NCELL
 
 ! Mesh Loop:
-MESH_LOOP : DO NM=1,NMESHES
-
-   IF (PROCESS(NM)/=MYID) CYCLE
+MESH_LOOP : DO NM=LOWER_MESH_INDEX,UPPER_MESH_INDEX
 
    CALL POINT_TO_MESH(NM)
 
@@ -7401,6 +7559,8 @@ SPECIES_LOOP: DO N=1,N_TOTAL_SCALARS
    IF (N_LP_ARRAY_INDICES>0 .OR. N_REACTIONS>0 .OR. ANY(SPECIES_MIXTURE%DEPOSITING)) THEN
       CALL GET_M_DOT_PPP_SCALAR_3D(N)
    ENDIF
+
+   IF (PERIODIC_TEST==7) CALL GET_SHUNN3_QZ(T,N)
 
    ! Flux vector F_EXIM in the EXIM boundary for species N:
    CALL GET_EXIMVECTOR_SCALAR_3D(N)
@@ -9821,7 +9981,7 @@ MESH_LOOP : DO NM=1,NMESHES
    ENDDO CUTFACE_LOOP
 
    ! In case of PERIODIC_TEST = 103, there are no immersed bodies.
-   IF(PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11) CYCLE
+   IF(PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11 .OR. PERIODIC_TEST==7) CYCLE
 
    ! Then INBOUNDARY cut-faces:
    ! This is only required in the case the pressure solve is done on the whole domain, i.e. FFT solver.
@@ -9917,7 +10077,7 @@ INTEGER :: IPT
 ! It is used when stratification is .TRUE.
 
 IF (.NOT. STRATIFICATION) RETURN
-IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11) RETURN
+IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11 .OR. PERIODIC_TEST==7) RETURN
 
 IF (CC_ZEROIBM_VELO) CC_INJECT_RHO0=.TRUE.
 
@@ -10089,7 +10249,7 @@ MESH_LOOP : DO NM=LOWER_MESH_INDEX,UPPER_MESH_INDEX
       J      = CUT_CELL(ICC)%IJK(JAXIS)
       K      = CUT_CELL(ICC)%IJK(KAXIS)
 
-      IF(PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11) THEN
+      IF(PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11 .OR. PERIODIC_TEST==7) THEN
          IF (PREDICTOR) THEN
             CUT_CELL(ICC)%H(1:NCELL) = HP(I,J,K)
          ELSE
@@ -10243,7 +10403,7 @@ REAL(EB):: U_INT,V_INT,W_INT
 ! This is the CCIBM forcing routine for momentum eqns.
 
 IF ( FREEZE_VELOCITY ) RETURN
-IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11) RETURN
+IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11 .OR. PERIODIC_TEST==7) RETURN
 
 IF (PREDICTOR) THEN
    UU => U
@@ -10762,7 +10922,7 @@ INTEGER :: I,J,K
 ! This is the CCIBM forcing routine for momentum eqns.
 
 IF ( FREEZE_VELOCITY ) RETURN
-IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11) RETURN
+IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11 .OR. PERIODIC_TEST==7) RETURN
 
 IF(PRESSURE_ITERATION) CALL POINT_TO_MESH(NM)
 
@@ -12522,7 +12682,7 @@ INTEGER, PARAMETER :: OZPOS=0, ICPOS=1, JCPOS=2, IFPOS=3, IWPOS=4
 DO_GASNXT_CUTFACE = .FALSE.
 DO_GASNXT_CARTCELL= .FALSE.
 
-IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST==11) FORCE_REGC_FACE_NXT=.FALSE.
+IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST==11 .OR. PERIODIC_TEST==7) FORCE_REGC_FACE_NXT=.FALSE.
 
 IF (FORCE_REGC_FACE_NXT) THEN
    DO_GASNXT_CUTFACE = .TRUE.
@@ -13154,7 +13314,7 @@ ENDDO MESHES_LOOP
 !!! ---
 
 ! Case of periodic test 103, return. No IBM interpolation needed as there are no immersed Bodies:
-IF(PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11) RETURN
+IF(PERIODIC_TEST==103 .OR. PERIODIC_TEST==11 .OR. PERIODIC_TEST==7) RETURN
 
 ! Then, second mesh loop:
 IF( ASSOCIATED(X1FACEP)) NULLIFY(X1FACEP)
@@ -18724,6 +18884,7 @@ END SUBROUTINE GET_ADVDIFFMATRIX_SCALAR_SYMM_3D
 SUBROUTINE GET_ADVDIFFMATRIX_SCALAR_3D(N)
 
 USE MATH_FUNCTIONS, ONLY: INTERPOLATE1D_UNIFORM
+USE MANUFACTURED_SOLUTIONS, ONLY: DIFF_MMS
 INTEGER, INTENT(IN) :: N
 
 ! Local Variables:
@@ -18825,9 +18986,17 @@ MESH_LOOP : DO NM=LOWER_MESH_INDEX,UPPER_MESH_INDEX
 
       ! Interpolate D_Z to the face:
       IF (DNS) THEN
-         DO ISIDE=-1,0
-            CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I+FCELL+ISIDE,J,K),D_Z_TEMP(ISIDE))
-         ENDDO
+         IF(PERIODIC_TEST==7) THEN
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               D_Z_TEMP(ISIDE) = DIFF_MMS / RHOP(I+FCELL+ISIDE,J,K)
+            ENDDO
+         ELSE
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I+FCELL+ISIDE,J,K),D_Z_TEMP(ISIDE))
+            ENDDO
+         ENDIF
       ELSE ! LES
          DO ISIDE=-1,0
             D_Z_TEMP(ISIDE)= MU(I+FCELL+ISIDE,J,K)*RSC/RHOP(I+FCELL+ISIDE,J,K)
@@ -18914,9 +19083,17 @@ MESH_LOOP : DO NM=LOWER_MESH_INDEX,UPPER_MESH_INDEX
 
       ! Interpolate D_Z to the face:
       IF (DNS) THEN
-         DO ISIDE=-1,0
-            CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I,J+FCELL+ISIDE,K),D_Z_TEMP(ISIDE))
-         ENDDO
+         IF(PERIODIC_TEST==7) THEN
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               D_Z_TEMP(ISIDE) = DIFF_MMS / RHOP(I,J+FCELL+ISIDE,K)
+            ENDDO
+         ELSE
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I,J+FCELL+ISIDE,K),D_Z_TEMP(ISIDE))
+            ENDDO
+         ENDIF
       ELSE ! LES
          DO ISIDE=-1,0
             D_Z_TEMP(ISIDE)= MU(I,J+FCELL+ISIDE,K)*RSC/RHOP(I,J+FCELL+ISIDE,K)
@@ -19001,9 +19178,17 @@ MESH_LOOP : DO NM=LOWER_MESH_INDEX,UPPER_MESH_INDEX
 
       ! Interpolate D_Z to the face:
       IF (DNS) THEN
-         DO ISIDE=-1,0
-            CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I,J,K+FCELL+ISIDE),D_Z_TEMP(ISIDE))
-         ENDDO
+         IF(PERIODIC_TEST==7) THEN
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               D_Z_TEMP(ISIDE) = DIFF_MMS / RHOP(I,J,K+FCELL+ISIDE)
+            ENDDO
+         ELSE
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP(I,J,K+FCELL+ISIDE),D_Z_TEMP(ISIDE))
+            ENDDO
+         ENDIF
       ELSE
          DO ISIDE=-1,0
             D_Z_TEMP(ISIDE)= MU(I,J,K+FCELL+ISIDE)*RSC/RHOP(I,J,K+FCELL+ISIDE)
@@ -19193,9 +19378,16 @@ MESH_LOOP : DO NM=LOWER_MESH_INDEX,UPPER_MESH_INDEX
 
       ! Interpolate D_Z to the face, linear interpolation:
       IF (DNS) THEN
-         DO ISIDE=-1,0
-            CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMPV(ISIDE),D_Z_TEMP(ISIDE))
-         ENDDO
+         IF(PERIODIC_TEST==7) THEN
+            ! Interpolate D_Z to the face:
+            DO ISIDE=-1,0
+               D_Z_TEMP(ISIDE) = DIFF_MMS / RHOPV(ISIDE)
+            ENDDO
+         ELSE
+            DO ISIDE=-1,0
+               CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMPV(ISIDE),D_Z_TEMP(ISIDE))
+            ENDDO
+         ENDIF
       ENDIF
       DIFF_FACE = CCM1*D_Z_TEMP(-1) + CCP1*D_Z_TEMP(0)
 
@@ -19298,7 +19490,11 @@ MESH_LOOP : DO NM=LOWER_MESH_INDEX,UPPER_MESH_INDEX
                TMP_ISIDE = -1._EB
             END SELECT
             IF (DNS) THEN
-               CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP_ISIDE,D_Z_TEMP(ISIDE))
+               IF(PERIODIC_TEST==7) THEN
+                  D_Z_TEMP(ISIDE) = DIFF_MMS / RHOPV(ISIDE)
+               ELSE
+                  CALL INTERPOLATE1D_UNIFORM(LBOUND(D_Z_N,1),D_Z_N,TMP_ISIDE,D_Z_TEMP(ISIDE))
+               ENDIF
             ELSE
                D_Z_TEMP(ISIDE)= MUV(ISIDE)*RSC/RHOPV(ISIDE)
             ENDIF
@@ -22209,13 +22405,20 @@ NYB=JBAR
 NZB=KBAR
 
 ! Test Sizes:
-IF (PERIODIC_TEST == 11) THEN
+IF (PERIODIC_TEST == 7 ) THEN
    VAL_TESTX_LOW =-.5_EB
    VAL_TESTX_HIGH= .5_EB
-   VAL_TESTY_LOW =-100000.0_EB
-   VAL_TESTY_HIGH= 100000.0_EB
-   VAL_TESTZ_LOW =-100000.0_EB
-   VAL_TESTZ_HIGH= 100000.0_EB
+   VAL_TESTY_LOW = YS
+   VAL_TESTY_HIGH= YF
+   VAL_TESTZ_LOW =-.5_EB
+   VAL_TESTZ_HIGH= .5_EB
+ELSEIF (PERIODIC_TEST == 11) THEN
+   VAL_TESTX_LOW =-.5_EB
+   VAL_TESTX_HIGH= .5_EB
+   VAL_TESTY_LOW = YS
+   VAL_TESTY_HIGH= YF
+   VAL_TESTZ_LOW = ZS
+   VAL_TESTZ_HIGH= ZF
 ELSEIF (PERIODIC_TEST == 103) THEN
    VAL_TESTX_LOW =-1.0_EB
    VAL_TESTX_HIGH= 1.0_EB
@@ -22537,7 +22740,7 @@ MAIN_MESH_LOOP : DO NM=LOWER_MESH_INDEX,UPPER_MESH_INDEX
    JLO = JLO_CELL; JHI = JHI_CELL
    KLO = KLO_CELL; KHI = KHI_CELL
 
-   IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11) THEN
+   IF (PERIODIC_TEST==103 .OR. PERIODIC_TEST==11 .OR. PERIODIC_TEST==7) THEN
       DO K=KLO,KHI
          DO J=JLO,JHI
             DO I=ILO,IHI
@@ -23148,8 +23351,10 @@ MAIN_MESH_LOOP : DO NM=1,NMESHES
    MESHES(NM)%CCVAR(:,:,:,IBM_CGSC) = IBM_GASPHASE
 
    ! Define EDGE_CROSS, CUT_EDGE, CUT_FACE and CUT_CELL arrays size for this mesh, and allocate:
-   IF(PERIODIC_TEST == 11)THEN
-      IBM_CUTCELLS_FOUND_MESH = (NXB+2*CCGUARD) * (NYB+2*CCGUARD) * (NZB+2*CCGUARD)
+   IF(PERIODIC_TEST==11)THEN
+      IBM_CUTCELLS_FOUND_MESH =  (NXB+2) / 2 * (NYB+1) * (NZB+1)
+   ELSEIF(PERIODIC_TEST==7) THEN
+      IBM_CUTCELLS_FOUND_MESH =  (NXB+1) * (NYB+1) * (NZB+1) / 4
    ELSE
       IBM_CUTCELLS_FOUND_MESH = 28 * NXB * NYB * NZB / (NXB + NYB + NZB) ! Beast approach. NEED TO REFINE THIS.
    ENDIF
@@ -27103,7 +27308,7 @@ REAL(EB) :: TNOW
 TNOW=CURRENT_TIME()
 
 ! Build a set of regular cut-cells in the middle of the domain to do testing.
-IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11) THEN
+IF (PERIODIC_TEST == 103 .OR. PERIODIC_TEST == 11 .OR. PERIODIC_TEST == 7) THEN
    CALL DEFINE_REGULAR_CUTFACES(NM,ISTR,IEND,JSTR,JEND,KSTR,KEND,BNDINT_FLAG)
    T_CC_USED(GET_CARTFACE_CUTFACES_TIME_INDEX) = T_CC_USED(GET_CARTFACE_CUTFACES_TIME_INDEX) + CURRENT_TIME() - TNOW
    RETURN
@@ -29104,7 +29309,6 @@ INTEGER :: NVERT_AUX, NEDGE_OLD, IVERT, COUNT, IEOLD, INOD
 LOGICAL :: FOUND
 REAL(EB):: XYZV(IAXIS:KAXIS)
 
-INTEGER :: NNN
 REAL(EB) :: TNOW
 
 TNOW=CURRENT_TIME()
@@ -29908,11 +30112,8 @@ DO K=KLO,KHI
             ! Define Body-triangle reference:
             MESHES(NM)%CUT_FACE(NCUTFACE)%BODTRI(1:2,NCF)= (/ IBOD, ITRI /)
 
-            ! Assign surf-index: Depending on GEOMETRY for now
-            MESHES(NM)%CUT_FACE(NCUTFACE)%SURF_INDEX(NCF) = DEFAULT_SURF_INDEX
-            DO NNN=0,N_SURF
-               IF (GEOMETRY(IBOD)%SURF_ID==SURFACE(NNN)%ID) MESHES(NM)%CUT_FACE(NCUTFACE)%SURF_INDEX(NCF) = NNN
-            ENDDO
+            ! Assign surf-index: Depending on GEOMETRY:
+            MESHES(NM)%CUT_FACE(NCUTFACE)%SURF_INDEX(NCF) = GEOMETRY(IBOD)%SURFS(ITRI)
 
          ENDDO ICF_LOOP
       ENDDO ! I
@@ -30881,15 +31082,19 @@ USE MATH_FUNCTIONS, ONLY: CROSS_PRODUCT
 
 ! input &GEOM lines
 
-CHARACTER(30) :: ID,SURF_ID, MATL_ID
-CHARACTER(60) :: BNDC_FILENAME, GEOC_FILENAME
-CHARACTER(30) :: TEXTURE_MAPPING
+CHARACTER(LABEL_LENGTH) :: ID, MATL_ID
+CHARACTER(LABEL_LENGTH) :: BNDC_FILENAME, GEOC_FILENAME
+CHARACTER(LABEL_LENGTH) :: TEXTURE_MAPPING
 CHARACTER(MESSAGE_LENGTH) :: MESSAGE, BUFFER
 
 INTEGER :: MAX_IDS=0
-CHARACTER(30),  ALLOCATABLE, DIMENSION(:) :: GEOM_IDS
+CHARACTER(LABEL_LENGTH),  ALLOCATABLE, DIMENSION(:) :: GEOM_IDS
 REAL(EB), ALLOCATABLE, DIMENSION(:) :: DAZIM, DELEV
 REAL(EB), ALLOCATABLE, DIMENSION(:,:) :: DSCALE, DXYZ0, DXYZ
+
+INTEGER :: MAX_SURF_IDS=0
+CHARACTER(LABEL_LENGTH),  ALLOCATABLE, DIMENSION(:) :: SURF_ID
+INTEGER, ALLOCATABLE, DIMENSION(:) :: SURF_ID_IND
 
 INTEGER :: MAX_ZVALS=0
 REAL(EB), ALLOCATABLE, DIMENSION(:) :: ZVALS
@@ -30899,7 +31104,7 @@ REAL(EB), ALLOCATABLE, TARGET, DIMENSION(:) :: VERTS
 LOGICAL, ALLOCATABLE, DIMENSION(:) :: IS_EXTERNAL
 
 INTEGER :: MAX_FACES=0, MAX_VOLUS=0
-INTEGER, ALLOCATABLE, TARGET, DIMENSION(:) :: FACES, VOLUS, OFACES
+INTEGER, ALLOCATABLE, TARGET, DIMENSION(:) :: FACES, VOLUS, OFACES, SURFS
 REAL(EB), ALLOCATABLE, DIMENSION(:) :: TFACES
 
 REAL(EB) :: AZIM, ELEV, SCALE(3), XYZ0(3), XYZ(3)
@@ -30910,7 +31115,7 @@ REAL(EB) :: SPHERE_ORIGIN(3), SPHERE_RADIUS
 REAL(EB) :: TEXTURE_ORIGIN(3), TEXTURE_SCALE(2)
 LOGICAL :: AUTO_TEXTURE
 REAL(EB) :: XB(6), DX
-INTEGER :: N_VERTS, N_FACES, N_FACES_TEMP, N_VOLUS, N_ZVALS
+INTEGER :: N_VERTS, N_FACES, N_FACES_TEMP, N_VOLUS, N_ZVALS, N_SURF_ID
 INTEGER :: MATL_INDEX
 INTEGER :: IOS,IZERO,N, I, J, K, IJ, NSUB_GEOMS, GEOM_INDEX
 INTEGER :: I1, I2, I3, I4, I5, I6, I7, I8
@@ -30928,7 +31133,7 @@ INTEGER, POINTER, DIMENSION(:) :: VOL
 INTEGER :: IVOL
 REAL(EB) :: VOLUME
 REAL(EB), POINTER, DIMENSION(:) :: V1, V2, V3, V4
-LOGICAL :: HAVE_SURF, HAVE_MATL
+LOGICAL :: HAVE_SURF, HAVE_MATL, IN_LIST
 INTEGER :: SORT_FACES
 INTEGER :: FIRST_FACE_INDEX
 REAL(EB) :: TXMIN, TXMAX, TYMIN, TYMAX, TX, TY
@@ -30936,6 +31141,8 @@ REAL(EB) :: TXMIN, TXMAX, TYMIN, TYMAX, TX, TY
 LOGICAL COMPONENT_ONLY
 LOGICAL, ALLOCATABLE, DIMENSION(:) :: DEFAULT_COMPONENT_ONLY
 TYPE(GEOMETRY_TYPE), POINTER :: G=>NULL(), GSUB=>NULL()
+
+LOGICAL :: SURF_INDEX_PER_FACE
 
 INTEGER :: II,II1,II2,II3
 REAL(EB):: DV1(MAX_DIM),DV2(MAX_DIM),NVECI(MAX_DIM),DXCEN(MAX_DIM),DOTI
@@ -30960,7 +31167,7 @@ COUNT_GEOM_LOOP: DO
    IF (IOS==1) EXIT COUNT_GEOM_LOOP
    READ(LU_INPUT,'(A)')BUFFER
    N_GEOMETRY=N_GEOMETRY+1
-   CALL GET_GEOM_INFO(MAX_ZVALS,MAX_VERTS,MAX_FACES,MAX_VOLUS,MAX_IDS) ! LU_INPUT not currently used.
+   CALL GET_GEOM_INFO(MAX_ZVALS,MAX_VERTS,MAX_FACES,MAX_VOLUS,MAX_IDS,MAX_SURF_IDS) ! LU_INPUT not currently used.
 ENDDO COUNT_GEOM_LOOP
 REWIND(LU_INPUT) ; INPUT_FILE_LINE_NUMBER = 0
 IF (N_GEOMETRY==0) RETURN
@@ -31051,9 +31258,17 @@ READ_GEOM_LOOP: DO N=1,N_GEOMETRY
 
    N_FACES=0
    DO I = 1, MAX_FACES
-      IF (ANY(FACES(3*I-2:3*I)==0)) EXIT
+      IF (ANY(FACES(4*(I-1)+1:4*(I-1)+3)==0)) EXIT
       N_FACES = N_FACES+1
    ENDDO
+   ! Now split FACES array into FACES (connectivity), and SURFS, i.e. local surf ID:
+   IF(N_FACES > 0) THEN
+      IF(ALLOCATED(SURFS)) DEALLOCATE(SURFS); ALLOCATE(SURFS(N_FACES))
+      DO I = 1, N_FACES
+         FACES(3*(I-1)+1:3*(I-1)+3) = FACES(4*(I-1)+1:4*(I-1)+3)
+         SURFS(I)                   = FACES(4*(I-1)+4)
+      ENDDO
+   ENDIF
    TFACES(1:6*MAX_FACES) = -1.0_EB
 
    ! count VOLUS
@@ -31374,11 +31589,40 @@ READ_GEOM_LOOP: DO N=1,N_GEOMETRY
    G%N_FACES_BASE = N_FACES
    G%N_VERTS_BASE = N_VERTS
 
-   IF (SURF_ID=='null') THEN
-      SURF_ID = 'INERT'
-      HAVE_SURF=.FALSE.
+   ! Check if SURF_ID(1) has been defined:
+   N_SURF_ID = 0
+   IF (TRIM(SURF_ID(1))=='null') THEN
+      SURF_INDEX_PER_FACE = .FALSE.
+      HAVE_SURF = .FALSE.
+      ALLOCATE(G%SURF_ID(1)); G%SURF_ID(1) = 'null'
+   ELSE
+      SURF_INDEX_PER_FACE = .TRUE.
+      ! Check that elements of the list of SURF_IDs are in list of SURFS:
+      ! How many SURF_ID entries are different than Null, where in SURFACE they belong:
+      DO I = 1, MAX_SURF_IDS
+         IF( SURF_ID(I)=='null' ) EXIT ! First 'null'
+         N_SURF_ID = N_SURF_ID + 1
+      ENDDO
+      ALLOCATE(G%SURF_ID(1:N_SURF_ID)); G%SURF_ID(1:N_SURF_ID) = SURF_ID(1:N_SURF_ID)
+
+      ! Now find correspondence with SURFACE(N)%ID:
+      IF (ALLOCATED(SURF_ID_IND)) DEALLOCATE(SURF_ID_IND); ALLOCATE(SURF_ID_IND(N_SURF_ID))
+      DO I = 1, N_SURF_ID
+          ! Get Surf Index:
+          IN_LIST = .FALSE.
+          DO J = 0, N_SURF
+             IF (TRIM(SURF_ID(I))/=TRIM(SURFACE(J)%ID)) CYCLE
+             SURF_ID_IND(I)=J
+             IN_LIST = .TRUE.
+             EXIT
+          ENDDO
+          IF(.NOT.IN_LIST) THEN
+             WRITE(MESSAGE,'(A,I4,3A)') &
+             'ERROR: problem with GEOM, the surface IDV(',I,') =',TRIM(SURF_ID(I)),' is not defined.'
+             CALL SHUTDOWN(MESSAGE)
+          ENDIF
+      ENDDO
    ENDIF
-   G%SURF_ID = SURF_ID
    G%HAVE_SURF = HAVE_SURF
 
    IF (MATL_ID=='null') THEN
@@ -31501,7 +31745,7 @@ READ_GEOM_LOOP: DO N=1,N_GEOMETRY
             CALL REORDER_VERTS(FACES(12*I+10:12*I+12))
          ENDDO
 
-      ! find faces that match
+         ! find faces that match
 
          SORT_FACES=2
          IF (GEOM_TYPE == 2) SORT_FACES = 3 ! Case of sphere.
@@ -31551,7 +31795,7 @@ READ_GEOM_LOOP: DO N=1,N_GEOMETRY
             ENDDO
          ENDIF
 
-      ! create new FACES index array keeping only external faces
+         ! create new FACES index array keeping only external faces
 
          N_FACES_TEMP = N_FACES
          N_FACES=0
@@ -31595,6 +31839,14 @@ READ_GEOM_LOOP: DO N=1,N_GEOMETRY
             ENDDO
          ENDIF
          CALL COMPUTE_TEXTURES(VERTS,FACES,TFACES,MAX_VERTS,MAX_FACES,N_FACES)
+
+         ! Surf IDs for generated GEOM:
+         IF(ALLOCATED(SURFS)) DEALLOCATE(SURFS); ALLOCATE(SURFS(N_FACES))
+         IF(SURF_INDEX_PER_FACE) THEN
+            SURFS(:) = 1 ! All external faces point to only entry SURF_ID(1).
+         ELSE
+            SURFS(:) = 0 ! All external faces point to default surf ID.
+         ENDIF
       ENDIF
    ENDIF
 
@@ -31613,7 +31865,27 @@ READ_GEOM_LOOP: DO N=1,N_GEOMETRY
 
       ALLOCATE(G%SURFS(N_FACES),STAT=IZERO)
       CALL ChkMemErr('READ_GEOM','G%SURFS',IZERO)
-      G%SURFS(1:N_FACES) = GET_SURF_INDEX(SURF_ID)
+
+      IF (SURF_INDEX_PER_FACE) THEN
+         DO I=1,N_FACES
+            IF ( SURFS(I) <= 0 ) THEN
+               G%SURFS(I) = DEFAULT_SURF_INDEX    ! If local SURF ID index <= 0, use default surf ID.
+            ELSE
+               G%SURFS(I) = SURF_ID_IND(SURFS(I))
+            ENDIF
+         ENDDO
+         DEALLOCATE(SURF_ID_IND)
+      ELSE
+         !If any of surfs is greater than zero throw an error:
+         DO I=1,N_FACES
+            IF ( SURFS(I) <= 0 ) CYCLE
+            WRITE(MESSAGE,'(A,I4,3A)') &
+            'ERROR: problem with GEOM, surface ID not defined, but surf ID index of FACE ',I,' is > 0.'
+            CALL SHUTDOWN(MESSAGE)
+            EXIT
+         ENDDO
+         G%SURFS(1:N_FACES) = DEFAULT_SURF_INDEX
+      ENDIF
    ENDIF
 
    IF (N_VERTS>0) THEN
@@ -31934,19 +32206,20 @@ END SUBROUTINE GET_GEOM_TRIBIN
 
 ! ---------------------------- GET_GEOM_INFO ----------------------------------------
 
-SUBROUTINE GET_GEOM_INFO(MAX_ZVALS,MAX_VERTS,MAX_FACES,MAX_VOLUS,MAX_IDS) ! LU_INPUT not used for now.
+SUBROUTINE GET_GEOM_INFO(MAX_ZVALS,MAX_VERTS,MAX_FACES,MAX_VOLUS,MAX_IDS,MAX_SURF_IDS) ! LU_INPUT not used for now.
 
 ! count number of various geometry types on the current &GEOM line
 ! for now assume a maximum value
 ! INTEGER, INTENT(IN) :: LU_INPUT
 
-INTEGER, INTENT(INOUT) :: MAX_ZVALS,MAX_VERTS,MAX_FACES,MAX_VOLUS,MAX_IDS
+INTEGER, INTENT(INOUT) :: MAX_ZVALS,MAX_VERTS,MAX_FACES,MAX_VOLUS,MAX_IDS,MAX_SURF_IDS
 
 MAX_ZVALS=MAX(MAX_ZVALS,100000)
 MAX_VOLUS=MAX(MAX_VOLUS,3*MAX_ZVALS,350000)
 MAX_FACES=MAX(MAX_FACES,4*MAX_VOLUS,100000)
 MAX_VERTS=MAX(MAX_VERTS,4*MAX_VOLUS,3*MAX_FACES,100000)
 MAX_IDS=MAX(MAX_IDS,1000)
+MAX_SURF_IDS=MAX(MAX_SURF_IDS,100)
 
 END SUBROUTINE GET_GEOM_INFO
 
@@ -31972,6 +32245,9 @@ CALL ChkMemErr('ALLOCATE_BUFFERS','DAZIM',IZERO)
 ALLOCATE(DELEV(MAX_IDS),STAT=IZERO)
 CALL ChkMemErr('ALLOCATE_BUFFERS','DELEV',IZERO)
 
+ALLOCATE(SURF_ID(MAX_SURF_IDS),STAT=IZERO)
+CALL ChkMemErr('ALLOCATE_BUFFERS','SURF_IDV',IZERO)
+
 ALLOCATE(ZVALS(MAX_ZVALS),STAT=IZERO)
 CALL ChkMemErr('ALLOCATE_BUFFERS','ZVALS',IZERO)
 
@@ -31981,7 +32257,7 @@ CALL ChkMemErr('ALLOCATE_BUFFERS','VERTS',IZERO)
 ALLOCATE(TFACES(6*MAX_FACES),STAT=IZERO)
 CALL ChkMemErr('ALLOCATE_BUFFERS','TFACES',IZERO)
 
-ALLOCATE(FACES(3*MAX_FACES),STAT=IZERO)
+ALLOCATE(FACES(4*MAX_FACES),STAT=IZERO)
 CALL ChkMemErr('ALLOCATE_BUFFERS','FACES',IZERO)
 
 ALLOCATE(VOLUS(4*MAX_VOLUS),STAT=IZERO)
@@ -31999,7 +32275,7 @@ SUBROUTINE SET_GEOM_DEFAULTS
    ZMIN=ZS_MIN
    COMPONENT_ONLY=DEFAULT_COMPONENT_ONLY(N)
    ID = 'geom'
-   SURF_ID = 'null'
+   SURF_ID(:)= 'null'
    MATL_ID = 'null'
    HAVE_SURF = .TRUE.
    HAVE_MATL = .TRUE.
@@ -33040,7 +33316,7 @@ ENDDO
 G%N_VERTS = IVERT
 G%N_FACES = IFACE
 G%N_VOLUS = IVOLUS
-IF (IFACE>0 .AND. G%HAVE_SURF) G%SURFS(1:G%N_FACES) = GET_SURF_INDEX(G%SURF_ID)
+IF (IFACE>0 .AND. G%HAVE_SURF) G%SURFS(1:G%N_FACES) = GET_SURF_INDEX(G%SURF_ID(1))
 IF (IVOLUS>0 .AND. G%HAVE_MATL) G%MATLS(1:G%N_VOLUS) = GET_MATL_INDEX(G%MATL_ID)
 IF (IVERT>0) G%VERTS(1:3*G%N_VERTS) = G%VERTS_BASE(1:3*G%N_VERTS)
 
