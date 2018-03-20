@@ -7023,7 +7023,10 @@ CONTAINS
                 ELSE ! Read FED from a file
                    ! Read FED, SOOT, TEMP(C), and RADFLUX
                    READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4!,& ! losa: new line
-                        TMPOUT5=0., TMPOUT6=0., TMPOUT7=0., TMPOUT8=0. ! losa: variables to write into by read
+                   TMPOUT5=0.
+                   TMPOUT6=0.
+                   TMPOUT7=0.
+                   TMPOUT8=0. ! losa: variables to write into by read
                    IF (IOS/=0) THEN
                       WRITE(MESSAGE,'(A)') 'ERROR: EVAC_MESH_EXCHANGE: FED read error'
                       CLOSE (LU_EVACFED)
