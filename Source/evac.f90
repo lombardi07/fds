@@ -7015,15 +7015,10 @@ CONTAINS
                         REAL(HUMAN_GRID(I,J)%FED_CO_CO2_O2,FB), &
                         REAL(HUMAN_GRID(I,J)%SOOT_DENS,FB), &
                         REAL(HUMAN_GRID(I,J)%TMP_G,FB), &
-                        REAL(HUMAN_GRID(I,J)%RADFLUX,FB), & ! losa: new line
-                        REAL(HUMAN_GRID(I,J)%LIM_C_CO,FB), & ! losa: save concentrations
-                        REAL(HUMAN_GRID(I,J)%LIM_C_CO2,FB), & ! losa: save concentrations
-                        REAL(HUMAN_GRID(I,J)%LIM_C_O2,FB), & ! losa: save concentrations
-                        REAL(HUMAN_GRID(I,J)%LIM_C_HCN,FB) ! losa: save concentrations
+                        REAL(HUMAN_GRID(I,J)%RADFLUX,FB)
                 ELSE ! Read FED from a file
                    ! Read FED, SOOT, TEMP(C), and RADFLUX
-                   READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4,& ! losa: new line
-                        TMPOUT5, TMPOUT6, TMPOUT7, TMPOUT8 ! losa: variables to write into by read
+                   READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4
                    IF (IOS/=0) THEN
                       WRITE(MESSAGE,'(A)') 'ERROR: EVAC_MESH_EXCHANGE: FED read error'
                       CLOSE (LU_EVACFED)
@@ -7033,10 +7028,6 @@ CONTAINS
                    HUMAN_GRID(I,J)%SOOT_DENS = TMPOUT2
                    HUMAN_GRID(I,J)%TMP_G = TMPOUT3
                    HUMAN_GRID(I,J)%RADFLUX = TMPOUT4
-                   HUMAN_GRID(I,J)%LIM_C_CO = TMPOUT5 ! losa: save concentrations
-                   HUMAN_GRID(I,J)%LIM_C_CO2 = TMPOUT6 ! losa: save concentrations
-                   HUMAN_GRID(I,J)%LIM_C_O2 = TMPOUT7 ! losa: save concentrations
-                   HUMAN_GRID(I,J)%LIM_C_HCN = TMPOUT8 ! losa: save concentrations
                 END IF   ! calculate and save FED
              END DO     ! J=1,JBAR
           END DO       ! I=1,IBAR
