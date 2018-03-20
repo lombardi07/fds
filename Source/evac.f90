@@ -7015,11 +7015,7 @@ CONTAINS
                         REAL(HUMAN_GRID(I,J)%FED_CO_CO2_O2,FB), &
                         REAL(HUMAN_GRID(I,J)%SOOT_DENS,FB), &
                         REAL(HUMAN_GRID(I,J)%TMP_G,FB), &
-                        REAL(HUMAN_GRID(I,J)%RADFLUX,FB), & ! losa: new line
-                        REAL(HUMAN_GRID(I,J)%LIM_C_CO,FB), & ! losa: save concentrations
-                        REAL(HUMAN_GRID(I,J)%LIM_C_CO2,FB), & ! losa: save concentrations
-                        REAL(HUMAN_GRID(I,J)%LIM_C_O2,FB), & ! losa: save concentrations
-                        REAL(HUMAN_GRID(I,J)%LIM_C_HCN,FB) ! losa: save concentrations
+                        REAL(HUMAN_GRID(I,J)%RADFLUX,FB)
                 ELSE ! Read FED from a file
                    ! Read FED, SOOT, TEMP(C), and RADFLUX
                    READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4
@@ -7039,10 +7035,6 @@ CONTAINS
           IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%TMP_G         = 0.0_EB
           IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%SOOT_DENS     = 0.0_EB
           IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%RADFLUX       = 0.0_EB
-          IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%LIM_C_CO      = 0.0_EB ! losa: don't read saved concentrations
-          IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%LIM_C_CO2     = 0.0_EB ! losa: don't read saved concentrations
-          IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%LIM_C_O2      = 0.0_EB ! losa: don't read saved concentrations
-          IF (DISCARD_SMOKE_INFO)  HUMAN_GRID(:,:)%LIM_C_HCN     = 0.0_EB ! losa: don't read saved concentrations
 
        END DO MESH_LOOP
 
