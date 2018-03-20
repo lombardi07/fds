@@ -7015,7 +7015,11 @@ CONTAINS
                         REAL(HUMAN_GRID(I,J)%FED_CO_CO2_O2,FB), &
                         REAL(HUMAN_GRID(I,J)%SOOT_DENS,FB), &
                         REAL(HUMAN_GRID(I,J)%TMP_G,FB), &
-                        REAL(HUMAN_GRID(I,J)%RADFLUX,FB)
+                        REAL(HUMAN_GRID(I,J)%RADFLUX,FB), & ! losa: new line
+                        REAL(HUMAN_GRID(I,J)%LIM_C_CO,FB), & ! losa: save concentrations
+                        REAL(HUMAN_GRID(I,J)%LIM_C_CO2,FB), & ! losa: save concentrations
+                        REAL(HUMAN_GRID(I,J)%LIM_C_O2,FB), & ! losa: save concentrations
+                        REAL(HUMAN_GRID(I,J)%LIM_C_HCN,FB) ! losa: save concentrations
                 ELSE ! Read FED from a file
                    ! Read FED, SOOT, TEMP(C), and RADFLUX
                    READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4
