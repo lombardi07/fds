@@ -7022,8 +7022,7 @@ CONTAINS
                         REAL(HUMAN_GRID(I,J)%LIM_C_HCN,FB) ! losa: save concentrations
                 ELSE ! Read FED from a file
                    ! Read FED, SOOT, TEMP(C), and RADFLUX
-                   READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4,& ! losa: new line
-                        TMPOUT5, TMPOUT6, TMPOUT7, TMPOUT8 ! losa: variables to write into by read
+                   READ (LU_EVACFED,IOSTAT=IOS) TMPOUT1, TMPOUT2, TMPOUT3, TMPOUT4
                    IF (IOS/=0) THEN
                       WRITE(MESSAGE,'(A)') 'ERROR: EVAC_MESH_EXCHANGE: FED read error'
                       CLOSE (LU_EVACFED)
@@ -7033,10 +7032,6 @@ CONTAINS
                    HUMAN_GRID(I,J)%SOOT_DENS = TMPOUT2
                    HUMAN_GRID(I,J)%TMP_G = TMPOUT3
                    HUMAN_GRID(I,J)%RADFLUX = TMPOUT4
-                   HUMAN_GRID(I,J)%LIM_C_CO = TMPOUT5 ! losa: save concentrations
-                   HUMAN_GRID(I,J)%LIM_C_CO2 = TMPOUT6 ! losa: save concentrations
-                   HUMAN_GRID(I,J)%LIM_C_O2 = TMPOUT7 ! losa: save concentrations
-                   HUMAN_GRID(I,J)%LIM_C_HCN = TMPOUT8 ! losa: save concentrations
                 END IF   ! calculate and save FED
              END DO     ! J=1,JBAR
           END DO       ! I=1,IBAR
@@ -7309,13 +7304,6 @@ CONTAINS
        FED_MAX       = 0.0_EB
        TED_MAX_ALIVE = 0.0_EB ! losa: purser's fractional thermal dose (TED) concept
        TED_MAX       = 0.0_EB ! losa: purser's fractional thermal dose (TED) concept
-       lim_tmp       = 0.0_EB ! losa: max of incapacitating quantity of living agent
-       lim_rad       = 0.0_EB ! losa: max of incapacitating quantity of living agent
-       lim_co        = 0.0_EB ! losa: max of incapacitating quantity of living agent
-       lim_co2       = 0.0_EB ! losa: max of incapacitating quantity of living agent
-       lim_o2        = 100.0_EB ! losa: max of incapacitating quantity of living agent
-       lim_hcn       = 0.0_EB ! losa: max of incapacitating quantity of living agent
-       lim_vis       = 30.0_EB ! losa: max of incapacitating quantity of living agent
     END IF
 
   END SUBROUTINE PREPARE_TO_EVACUATE
