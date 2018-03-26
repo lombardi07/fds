@@ -8150,7 +8150,7 @@ CONTAINS
              lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
           END IF ! losa: end if, incapacitation limits
           L_DEAD = .FALSE.
-          IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (TED) concept
+          IF ( HR%INTDOSE >= 0.3_EB .OR. HR%TMPDOSE >= 0.3_EB ) THEN ! losa: purser's fractional thermal dose (TED) concept
              L_DEAD = .TRUE.
              ! No random force for a dead person.
              GATH = 0.0_EB
@@ -8975,7 +8975,7 @@ CONTAINS
              lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
           END IF ! losa: end if, incapacitation limits
           L_DEAD  = .FALSE.
-          IF (HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB) THEN ! losa: purser's fractional thermal dose (TED) concept
+          IF (HR%INTDOSE >= 0.3_EB .OR. HR%TMPDOSE >= 0.3_EB) THEN ! losa: purser's fractional thermal dose (TED) concept
              L_DEAD = .TRUE.
              ! No random force for a dead person.
              GATH = 0.0_EB
@@ -12373,7 +12373,7 @@ CONTAINS
                lim_hcn = MAX(lim_hcn,HR%LimHCN) ! losa: max of incapacitating quantity of living agent
                lim_vis = MIN(lim_vis,HR%LimVis) ! losa: max of incapacitating quantity of living agent
             END IF ! losa: end if, incapacitation limits
-            IF ( HR%INTDOSE >= 1.0_EB .OR. HR%TMPDOSE >= 1.0_EB ) THEN ! losa: purser's fractional thermal dose (TED) concept
+            IF ( HR%INTDOSE >= 0.3_EB .OR. HR%TMPDOSE >= 0.3_EB ) THEN ! losa: purser's fractional thermal dose (TED) concept
                IF (HR%TPRE /= HUGE(HR%TPRE)) THEN
                   N_DEAD = N_DEAD+1
                   HR%TPRE = HUGE(HR%TPRE)
